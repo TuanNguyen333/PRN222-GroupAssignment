@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Pages\Categories\" />
+    <Folder Include="Components\Pages\Members\" />
+    <Folder Include="Components\Pages\Products\" />
+    <Folder Include="Components\Pages\Orders\" />
+    <Folder Include="Components\Pages\OrderDetails\" />
+  </ItemGroup>
+
+</Project>
