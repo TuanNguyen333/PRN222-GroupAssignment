@@ -83,7 +83,7 @@ namespace Services.Implementation
             }
         }
 
-        public async Task<ApiResponse<OrderDto>> CreateAsync(OrderForCreationDto order, int userId)
+        public async Task<ApiResponse<OrderDto>> CreateAsync(OrderForCreationDto order)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace Services.Implementation
             }
         }
 
-        public async Task<ApiResponse<OrderDto>> UpdateAsync(int id, OrderForUpdateDto order, int userId)
+        public async Task<ApiResponse<OrderDto>> UpdateAsync(int id, OrderForUpdateDto order)
         {
             try
             {

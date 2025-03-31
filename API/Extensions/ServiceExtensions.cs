@@ -37,6 +37,7 @@ namespace API.Extensions
             services.AddScoped<IMemberService, MemberService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderDetailService, OrderDetailService>();
             return services;
         }
 
