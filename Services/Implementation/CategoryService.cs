@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BusinessObjects.Base;
-// Ensure this namespace is included
+using FluentValidation;
 using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Category;
@@ -16,12 +16,16 @@ namespace Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IValidator<CategoryForCreationDto> _creationValidator;
+        private readonly IValidator<CategoryForUpdateDto> _updateValidator;
         private const int DEFAULT_PAGE_SIZE = 10;
 
-        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CategoryForCreationDto> creationValidator, IValidator<CategoryForUpdateDto> updateValidator)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _creationValidator = creationValidator ?? throw new ArgumentNullException(nameof(creationValidator));
+            _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));
         }
 
         public async Task<PagedApiResponse<CategoryDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
@@ -79,14 +83,19 @@ namespace Services.Implementation
                 if (category == null)
                     return ApiResponse<CategoryDto>.ErrorResponse("Category cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
-
+                var validationResult = await _creationValidator.ValidateAsync(category);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<CategoryDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
                 await _unitOfWork.BeginTransactionAsync();
-
                 var categoryEntity = _mapper.Map<Category>(category);
-                _unitOfWork.CategoryRepository.Add(categoryEntity);
-
+                var lastCategory = await _unitOfWork.CategoryRepository.GetAllAsync(1, int.MaxValue);
+                categoryEntity.CategoryId = lastCategory.Max(c => c.CategoryId) + 1;
+                 _unitOfWork.CategoryRepository.Add(categoryEntity);
                 await _unitOfWork.CommitTransactionAsync();
-
                 var categoryDto = _mapper.Map<CategoryDto>(categoryEntity);
                 return ApiResponse<CategoryDto>.SuccessResponse(categoryDto, "Category created successfully");
             }
@@ -105,6 +114,14 @@ namespace Services.Implementation
                 if (category == null)
                     return ApiResponse<CategoryDto>.ErrorResponse("Category cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
+
+                var validationResult = await _updateValidator.ValidateAsync(category);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<CategoryDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
 
                 var existingCategory = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
                 if (existingCategory == null)

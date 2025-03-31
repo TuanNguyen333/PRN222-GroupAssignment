@@ -10,6 +10,13 @@ using Microsoft.OpenApi.Models;
 using BusinessObjects.Entities;
 using Services.Interface;
 using Services.Implementation;
+using FluentValidation;
+using Validations;
+using BusinessObjects.Dto.Category;
+using Validations.Category;
+using BusinessObjects.Dto.Member;
+using BusinessObjects.Dto.Order;
+using BusinessObjects.Dto.Product;
 
 namespace API.Extensions
 {
@@ -74,6 +81,35 @@ namespace API.Extensions
                     Description = "API for managing categories, members, products, and orders"
                 });
             });
+            return services;
+        }
+
+
+
+        public static IServiceCollection ConfigureFluentValidations(this IServiceCollection services)
+        {
+            #region Category
+            services.AddValidatorsFromAssemblyContaining<CategoryForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<CategoryForUpdateValidator>();
+            #endregion
+
+            #region Member
+            services.AddValidatorsFromAssemblyContaining<MemberForCreationDto>();
+            services.AddValidatorsFromAssemblyContaining<MemberForUpdateDto>();
+            #endregion
+
+            #region Order
+            services.AddValidatorsFromAssemblyContaining<OrderForCreationDto>();
+            services.AddValidatorsFromAssemblyContaining<OrderForUpdateDto>();
+            #endregion
+
+            #region Product
+            services.AddValidatorsFromAssemblyContaining<ProductForCreationDto>();
+            services.AddValidatorsFromAssemblyContaining<ProductForUpdateDto>();
+            #endregion
+
+
+
             return services;
         }
     }

@@ -83,8 +83,12 @@ namespace Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
 
                 var memberEntity = _mapper.Map<Member>(member);
-                _unitOfWork.MemberRepository.Add(memberEntity);
 
+                // Increment the ID by 1
+                var lastMember = await _unitOfWork.MemberRepository.GetAllAsync(1, int.MaxValue);
+                memberEntity.MemberId = lastMember.Max(m => m.MemberId) + 1;
+
+                _unitOfWork.MemberRepository.Add(memberEntity);
                 await _unitOfWork.CommitTransactionAsync();
 
                 var memberDto = _mapper.Map<MemberDto>(memberEntity);

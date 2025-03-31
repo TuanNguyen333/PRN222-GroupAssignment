@@ -26,14 +26,24 @@ namespace Repositories.Implementation
 
 
         public UnitOfWork(eStoreDBContext context) => _context = context;
-    
+
         public async Task BeginTransactionAsync()
         {
+            if (_transaction != null)
+            {
+                throw new InvalidOperationException("A transaction is already in progress.");
+            }
+
             _transaction = await _context.Database.BeginTransactionAsync();
         }
 
         public async Task CommitTransactionAsync()
         {
+            if (_transaction == null)
+            {
+                throw new InvalidOperationException("No transaction in progress.");
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -44,12 +54,30 @@ namespace Repositories.Implementation
                 await RollbackTransactionAsync();
                 throw;
             }
+            finally
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
         }
+
 
         public async Task RollbackTransactionAsync()
         {
-            await _transaction.RollbackAsync();
-            await _transaction.DisposeAsync();
+            if (_transaction == null)
+            {
+                throw new InvalidOperationException("No transaction in progress.");
+            }
+
+            try
+            {
+                await _transaction.RollbackAsync();
+            }
+            finally
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
         }
 
         public void Dispose()

@@ -91,8 +91,12 @@ namespace Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
 
                 var productEntity = _mapper.Map<Product>(product);
-                _unitOfWork.ProductRepository.Add(productEntity);
 
+                // Increment the ID by 1
+                var lastProduct = await _unitOfWork.ProductRepository.GetAllAsync(1, int.MaxValue);
+                productEntity.ProductId = lastProduct.Max(p => p.ProductId) + 1;
+
+                _unitOfWork.ProductRepository.Add(productEntity);
                 await _unitOfWork.CommitTransactionAsync();
 
                 var productDto = _mapper.Map<ProductDto>(productEntity);
@@ -105,7 +109,6 @@ namespace Services.Implementation
                     new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message));
             }
         }
-
         public async Task<ApiResponse<ProductDto>> UpdateAsync(int id, ProductForUpdateDto product)
         {
             try

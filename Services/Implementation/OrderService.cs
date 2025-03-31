@@ -92,6 +92,10 @@ namespace Services.Implementation
                 // Add userId to order entity if applicable (assuming Order has a UserId property)
                 // orderEntity.UserId = userId;
 
+                // Increment the ID by 1
+                var lastOrder = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
+                orderEntity.OrderId = lastOrder.Max(o => o.OrderId) + 1;
+
                 _unitOfWork.OrderRepository.Add(orderEntity);
                 await _unitOfWork.CommitTransactionAsync();
 

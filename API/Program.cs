@@ -32,6 +32,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddAuthorization();
+        builder.Services.ConfigureFluentValidations();
 
         builder.Services.AddDbContext<eStoreDBContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection"))

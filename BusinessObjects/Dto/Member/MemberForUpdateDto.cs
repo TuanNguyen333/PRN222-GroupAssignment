@@ -8,6 +8,8 @@ namespace BusinessObjects.Dto.Member
 {
     public class MemberForUpdateDto
     {
+        public string Email { get; set; }
+
         public string CompanyName { get; set; }
 
         public string City { get; set; }
