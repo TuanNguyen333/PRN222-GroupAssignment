@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BusinessObjects.Base;
+using FluentValidation;
 using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Entities;
@@ -15,12 +16,16 @@ namespace Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IValidator<ProductForCreationDto> _creationValidator;
+        private readonly IValidator<ProductForUpdateDto> _updateValidator;
         private const int DEFAULT_PAGE_SIZE = 10;
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<ProductForCreationDto> creationValidator, IValidator<ProductForUpdateDto> updateValidator)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _creationValidator = creationValidator ?? throw new ArgumentNullException(nameof(creationValidator));
+            _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));
         }
 
         public async Task<PagedApiResponse<ProductDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
@@ -88,6 +93,14 @@ namespace Services.Implementation
                     return ApiResponse<ProductDto>.ErrorResponse("Product cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
 
+                var validationResult = await _creationValidator.ValidateAsync(product);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<ProductDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
+
                 await _unitOfWork.BeginTransactionAsync();
 
                 var productEntity = _mapper.Map<Product>(product);
@@ -109,6 +122,7 @@ namespace Services.Implementation
                     new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message));
             }
         }
+
         public async Task<ApiResponse<ProductDto>> UpdateAsync(int id, ProductForUpdateDto product)
         {
             try
@@ -116,6 +130,14 @@ namespace Services.Implementation
                 if (product == null)
                     return ApiResponse<ProductDto>.ErrorResponse("Product cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
+
+                var validationResult = await _updateValidator.ValidateAsync(product);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<ProductDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
 
                 var existingProduct = await _unitOfWork.ProductRepository.GetByIdAsync(id);
                 if (existingProduct == null)

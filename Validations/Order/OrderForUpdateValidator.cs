@@ -1,21 +1,20 @@
 ﻿using FluentValidation;
-using BusinessObjects.Dto.Product;
+using BusinessObjects.Dto.Order;
 
-namespace Validations.Product
+namespace Validations.Order
 {
-    public class ProductForCreationValidator : AbstractValidator<ProductForCreationDto>
+    public class OrderForUpdateValidator : AbstractValidator<OrderForUpdateDto>
     {
-        public ProductForCreationValidator()
+        public OrderForUpdateValidator()
         {
-            RuleFor(product => product.ProductName)
-                .NotEmpty().WithMessage("Product Name is required.")
-                .MaximumLength(40).WithMessage("Product Name cannot exceed 40 characters.");
+            RuleFor(order => order.MemberId)
+                .GreaterThan(0).WithMessage("Member ID is required.");
 
-            RuleFor(product => product.UnitPrice)
-                .GreaterThanOrEqualTo(0).WithMessage("Unit Price must be a positive value.");
+            RuleFor(order => order.OrderDate)
+                .NotEmpty().WithMessage("Order Date is required.");
 
-            RuleFor(product => product.UnitsInStock)
-                .GreaterThanOrEqualTo(0).WithMessage("Units In Stock must be a positive value.");
+            RuleFor(order => order.Freight)
+                .GreaterThanOrEqualTo(0).WithMessage("Freight must be a positive value.");
         }
     }
 }

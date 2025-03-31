@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BusinessObjects.Base;
+using FluentValidation;
 using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Member;
@@ -15,12 +16,16 @@ namespace Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IValidator<MemberForCreationDto> _creationValidator;
+        private readonly IValidator<MemberForUpdateDto> _updateValidator;
         private const int DEFAULT_PAGE_SIZE = 10;
 
-        public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MemberService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<MemberForCreationDto> creationValidator, IValidator<MemberForUpdateDto> updateValidator)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _creationValidator = creationValidator ?? throw new ArgumentNullException(nameof(creationValidator));
+            _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));
         }
 
         public async Task<PagedApiResponse<MemberDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
@@ -80,6 +85,14 @@ namespace Services.Implementation
                     return ApiResponse<MemberDto>.ErrorResponse("Member cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
 
+                var validationResult = await _creationValidator.ValidateAsync(member);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<MemberDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
+
                 await _unitOfWork.BeginTransactionAsync();
 
                 var memberEntity = _mapper.Map<Member>(member);
@@ -109,6 +122,14 @@ namespace Services.Implementation
                 if (member == null)
                     return ApiResponse<MemberDto>.ErrorResponse("Member cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
+
+                var validationResult = await _updateValidator.ValidateAsync(member);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<MemberDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
 
                 var existingMember = await _unitOfWork.MemberRepository.GetByIdAsync(id);
                 if (existingMember == null)

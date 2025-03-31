@@ -17,6 +17,9 @@ using Validations.Category;
 using BusinessObjects.Dto.Member;
 using BusinessObjects.Dto.Order;
 using BusinessObjects.Dto.Product;
+using Validations.Member;
+using Validations.Order;
+using Validations.Product;
 
 namespace API.Extensions
 {
@@ -94,21 +97,19 @@ namespace API.Extensions
             #endregion
 
             #region Member
-            services.AddValidatorsFromAssemblyContaining<MemberForCreationDto>();
-            services.AddValidatorsFromAssemblyContaining<MemberForUpdateDto>();
+            services.AddValidatorsFromAssemblyContaining<MemberForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<MemberForUpdateValidator>();
             #endregion
 
             #region Order
-            services.AddValidatorsFromAssemblyContaining<OrderForCreationDto>();
-            services.AddValidatorsFromAssemblyContaining<OrderForUpdateDto>();
+            services.AddValidatorsFromAssemblyContaining<OrderForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<OrderForUpdateValidator>();
             #endregion
 
             #region Product
-            services.AddValidatorsFromAssemblyContaining<ProductForCreationDto>();
-            services.AddValidatorsFromAssemblyContaining<ProductForUpdateDto>();
+            services.AddValidatorsFromAssemblyContaining<ProductForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<ProductForUpdateValidator>();
             #endregion
-
-
 
             return services;
         }

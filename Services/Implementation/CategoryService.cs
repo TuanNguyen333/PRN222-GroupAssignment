@@ -94,7 +94,7 @@ namespace Services.Implementation
                 var categoryEntity = _mapper.Map<Category>(category);
                 var lastCategory = await _unitOfWork.CategoryRepository.GetAllAsync(1, int.MaxValue);
                 categoryEntity.CategoryId = lastCategory.Max(c => c.CategoryId) + 1;
-                 _unitOfWork.CategoryRepository.Add(categoryEntity);
+                _unitOfWork.CategoryRepository.Add(categoryEntity);
                 await _unitOfWork.CommitTransactionAsync();
                 var categoryDto = _mapper.Map<CategoryDto>(categoryEntity);
                 return ApiResponse<CategoryDto>.SuccessResponse(categoryDto, "Category created successfully");

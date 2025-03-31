@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BusinessObjects.Base;
+using FluentValidation;
 using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Order;
@@ -15,12 +16,16 @@ namespace Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IValidator<OrderForCreationDto> _creationValidator;
+        private readonly IValidator<OrderForUpdateDto> _updateValidator;
         private const int DEFAULT_PAGE_SIZE = 10;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<OrderForCreationDto> creationValidator, IValidator<OrderForUpdateDto> updateValidator)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _creationValidator = creationValidator ?? throw new ArgumentNullException(nameof(creationValidator));
+            _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));
         }
 
         public async Task<ApiResponse<OrderDto>> GetByIdAsync(int id)
@@ -86,6 +91,14 @@ namespace Services.Implementation
                     return ApiResponse<OrderDto>.ErrorResponse("Order cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
 
+                var validationResult = await _creationValidator.ValidateAsync(order);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<OrderDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
+
                 await _unitOfWork.BeginTransactionAsync();
 
                 var orderEntity = _mapper.Map<Order>(order);
@@ -117,6 +130,14 @@ namespace Services.Implementation
                 if (order == null)
                     return ApiResponse<OrderDto>.ErrorResponse("Order cannot be null",
                         new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Input data is null"));
+
+                var validationResult = await _updateValidator.ValidateAsync(order);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ApiResponse<OrderDto>.ErrorResponse("Validation failed",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", string.Join(", ", errors)));
+                }
 
                 var existingOrder = await _unitOfWork.OrderRepository.GetByIdAsync(id);
                 if (existingOrder == null)
