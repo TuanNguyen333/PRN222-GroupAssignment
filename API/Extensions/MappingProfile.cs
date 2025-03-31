@@ -2,6 +2,7 @@
 using BusinessObjects.Dto.Category;
 using BusinessObjects.Dto.Member;
 using BusinessObjects.Dto.Order;
+using BusinessObjects.Dto.OrderDetail;
 using BusinessObjects.Dto.Product;
 using BusinessObjects.Entities;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,17 @@ namespace API.Extensions
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId));
             CreateMap<OrderForCreationDto, Order>();
             CreateMap<OrderForUpdateDto, Order>();
+            #endregion
+            
+            #region OrderDetail
+            CreateMap<OrderDetail, OrderDetailDto>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
+                .ForMember(dest => dest.OrderDto, opt => opt.MapFrom(src => src.Order))
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.ProductDto, opt => opt.MapFrom(src => src.Product))
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.UnitPrice))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount));
             #endregion
         }
     }
