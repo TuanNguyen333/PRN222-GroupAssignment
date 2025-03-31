@@ -18,10 +18,12 @@ namespace Repositories.Implementation
         private IMemberRepository _memberRepository;
         private IOrderRepository _orderRepository;
         private IProductRepository _productRepository;
+        private IOrderDetailRepository _orderDetailRepository;
 
         public ICategoryRepository CategoryRepository => _categoryRepository ??= new CategoryRepository(_context);
         public IMemberRepository MemberRepository => _memberRepository ??= new MemberRepository(_context);
         public IOrderRepository OrderRepository => _orderRepository ??= new OrderRepository(_context);
+        public IOrderDetailRepository OrderDetailRepository => _orderDetailRepository ??= new OrderDetailRepository(_context);
         public IProductRepository ProductRepository => _productRepository ??= new ProductRepository(_context);
 
 

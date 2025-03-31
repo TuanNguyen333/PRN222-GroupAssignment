@@ -12,6 +12,7 @@ namespace Repositories.Interface
         IMemberRepository MemberRepository { get; }
         IProductRepository ProductRepository { get; }
         IOrderRepository OrderRepository { get; }
+        IOrderDetailRepository OrderDetailRepository { get; }
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();

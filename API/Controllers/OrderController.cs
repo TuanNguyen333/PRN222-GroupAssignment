@@ -49,9 +49,9 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] OrderForCreationDto order, [FromQuery] int userId)
+        public async Task<IActionResult> Create([FromBody] OrderForCreationDto order)
         {
-            var response = await _orderService.CreateAsync(order, userId);
+            var response = await _orderService.CreateAsync(order);
             if (!response.Success)
             {
                 return BadRequest(response);
@@ -64,9 +64,9 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update(int id, [FromBody] OrderForUpdateDto order, [FromQuery] int userId)
+        public async Task<IActionResult> Update(int id, [FromBody] OrderForUpdateDto order)
         {
-            var response = await _orderService.UpdateAsync(id, order, userId);
+            var response = await _orderService.UpdateAsync(id, order);
             if (!response.Success)
             {
                 if (response.Errors?.ErrorCode == "NOT_FOUND")
