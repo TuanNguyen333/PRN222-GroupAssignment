@@ -9,5 +9,6 @@ namespace Repositories.Interface
 {
     public interface IMemberRepository : IRepositoryBase<Member, int>
     {
+        Task<Member?> GetByEmailAsync(string email);
     }
 }

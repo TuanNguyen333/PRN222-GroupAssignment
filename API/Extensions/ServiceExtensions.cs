@@ -20,6 +20,14 @@ using BusinessObjects.Dto.Product;
 using Validations.Member;
 using Validations.Order;
 using Validations.Product;
+using Microsoft.AspNetCore.Authentication;
+using Services.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using BusinessObjects.Dto.Auth;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.OpenApi.Any;
 
 namespace API.Extensions
 {
@@ -33,6 +41,7 @@ namespace API.Extensions
 
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IMemberService, MemberService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -84,11 +93,34 @@ namespace API.Extensions
                     Version = "v1",
                     Description = "API for managing categories, members, products, and orders"
                 });
+
+                // Add JWT authentication to Swagger
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
             return services;
         }
-
-
 
         public static IServiceCollection ConfigureFluentValidations(this IServiceCollection services)
         {
@@ -111,6 +143,41 @@ namespace API.Extensions
             services.AddValidatorsFromAssemblyContaining<ProductForCreationValidator>();
             services.AddValidatorsFromAssemblyContaining<ProductForUpdateValidator>();
             #endregion
+
+            return services;
+        }
+
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Bind JWT settings from configuration
+            var jwtSettings = new JwtSettings();
+            configuration.GetSection("JwtSettings").Bind(jwtSettings);
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+            // Add JWT authentication
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false; // Set to true in production
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Key)),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            services.AddScoped<JwtProvider>();
 
             return services;
         }

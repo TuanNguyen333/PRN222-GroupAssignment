@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessObjects.Dto.Member
@@ -18,6 +19,7 @@ namespace BusinessObjects.Dto.Member
 
         public string Country { get; set; }
 
+        [JsonIgnore]
         public string Password { get; set; }
     }
 }

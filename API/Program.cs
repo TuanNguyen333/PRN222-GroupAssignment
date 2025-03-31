@@ -27,7 +27,8 @@ public class Program
             .AddBusinessServices()
             .AddCorsPolicy()
             .AddAutoMapper(typeof(MappingProfile))
-            .AddSwagger();
+            .AddSwagger()
+            .AddJwtAuthentication(builder.Configuration);
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
@@ -51,6 +52,7 @@ public class Program
         });
          app.UseHttpsRedirection();
         app.UseCors("AllowFrontendApp");
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
 
