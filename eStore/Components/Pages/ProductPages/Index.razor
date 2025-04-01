@@ -1,0 +1,303 @@
+﻿@page "/products"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@rendermode InteractiveServer
+@inject IProductService ProductService
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> Logger
+
+<PageTitle>Products</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Products</h2>
+        <a href="/products/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Product
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form @onsubmit="HandleSearch" class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchName" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="searchName" @bind="searchName" placeholder="Enter product name...">
+                </div>
+                <div class="col-md-3">
+                    <label for="minPrice" class="form-label">Min Price ($)</label>
+                    <input type="number" class="form-control" id="minPrice" @bind="minPrice" min="0" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <label for="maxPrice" class="form-label">Max Price ($)</label>
+                    <input type="number" class="form-control" id="maxPrice" @bind="maxPrice" min="0" step="0.01">
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="ClearFilters">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @messageClass" role="alert">
+            @message
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (products?.Items == null || !products.Items.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No Products Found</h4>
+            <p>We couldn't find any products matching your search criteria.</p>
+            <hr>
+            <p class="mb-0">
+                Try these suggestions:
+                <ul class="mb-0">
+                    <li>Check if you entered the product name correctly</li>
+                    <li>Try adjusting the price range</li>
+                    <li>Clear all filters and try again</li>
+                    <li>Check if there are any products in the database</li>
+                </ul>
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Weight</th>
+                        <th>Unit Price</th>
+                        <th>Units in Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in products.Items)
+                    {
+                        <tr>
+                            <td>@product.ProductName</td>
+                            <td>@(GetCategoryName(product.CategoryId))</td>
+                            <td>@product.Weight</td>
+                            <td>$@product.UnitPrice</td>
+                            <td>@product.UnitsInStock</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="/products/edit/@product.ProductId" class="btn btn-sm btn-primary me-1">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a href="/products/delete/@product.ProductId" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (products.TotalPages > 1)
+        {
+            <nav aria-label="Product pagination">
+                <ul class="pagination justify-content-center">
+                    @if (products.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <button type="button" class="page-link" @onclick="async () => await LoadProducts(products.PageNumber - 1)">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </button>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= products.TotalPages; i++)
+                    {
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == products.PageNumber ? "active" : "")">
+                            <button type="button" class="page-link" @onclick="async () => await LoadProducts(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+
+                    @if (products.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <button type="button" class="page-link" @onclick="async () => await LoadProducts(products.PageNumber + 1)">
+                                Next <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                Showing @((products.PageNumber - 1) * products.PageSize + 1) to 
+                @(Math.Min(products.PageNumber * products.PageSize, products.TotalItems)) 
+                of @products.TotalItems products
+            </small>
+        </div>
+    }
+</div>
+
+@code {
+    private PagedResponse<Product>? products;
+    private Dictionary<int, string> categoryNames = new();
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+    private string searchName = string.Empty;
+    private decimal? minPrice;
+    private decimal? maxPrice;
+    private const int PageSize = 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts(1);
+    }
+
+    private async Task ClearFilters()
+    {
+        searchName = string.Empty;
+        minPrice = null;
+        maxPrice = null;
+        await LoadProducts(1);
+    }
+
+    private async Task HandleSearch()
+    {
+        await LoadProducts(1);
+    }
+
+    private async Task HandlePageChange(int page)
+    {
+        if (page < 1)
+        {
+            return;
+        }
+        await LoadProducts(page);
+    }
+
+    private async Task LoadProducts(int page)
+    {
+        try
+        {
+            isLoading = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+            
+            Console.WriteLine($"Loading page {page} with search: {searchName}, minPrice: {minPrice}, maxPrice: {maxPrice}");
+            
+            var response = await ProductService.GetAllProductsAsync(
+                pageNumber: page,
+                pageSize: PageSize,
+                search: searchName,
+                minUnitPrice: minPrice,
+                maxUnitPrice: maxPrice
+            );
+
+            if (response == null)
+            {
+                message = "Failed to get response from server";
+                messageClass = "alert-danger";
+                Console.WriteLine("Response is null");
+                return;
+            }
+
+            if (!response.Success)
+            {
+                message = response.Message ?? "Failed to load products";
+                messageClass = "alert-warning";
+                if (response.Errors != null)
+                {
+                    Console.WriteLine($"API Errors: {string.Join(", ", response.Errors)}");
+                }
+                return;
+            }
+
+            if (response.Data == null)
+            {
+                message = "No data received from server";
+                messageClass = "alert-warning";
+                Console.WriteLine("Response data is null");
+                return;
+            }
+
+            products = response.Data;
+            Console.WriteLine($"Loaded response with {products.TotalItems} total items, {products.TotalPages} total pages");
+
+            if (products.Items == null || !products.Items.Any())
+            {
+                message = "No products found matching your search criteria.";
+                messageClass = "alert-info";
+                Console.WriteLine("No items in response data");
+            }
+            else
+            {
+                await LoadCategoryNames();
+                Console.WriteLine($"Loaded {products.Items.Count} products on page {products.PageNumber} of {products.TotalPages}");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading products");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading products. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while loading products");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadCategoryNames()
+    {
+        try
+        {
+            foreach (var product in products!.Items)
+            {
+                if (!categoryNames.ContainsKey(product.CategoryId))
+                {
+                    var category = await CategoryService.GetCategoryByIdAsync(product.CategoryId);
+                    categoryNames[product.CategoryId] = category?.CategoryName ?? $"Category {product.CategoryId}";
+                }
+            }
+            Logger.LogInformation("Successfully loaded category names");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading category names");
+        }
+    }
+
+    private string GetCategoryName(int categoryId)
+    {
+        return categoryNames.TryGetValue(categoryId, out var name) ? name : $"Category {categoryId}";
+    }
+}
