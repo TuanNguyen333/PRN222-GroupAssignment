@@ -3,6 +3,7 @@
 @using eStore.Services
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.Logging
+@using Microsoft.AspNetCore.SignalR.Client
 @rendermode InteractiveServer
 @inject IProductService ProductService
 @inject ICategoryService CategoryService
@@ -161,6 +162,7 @@
 </div>
 
 @code {
+    private HubConnection? hubConnection;
     private PagedResponse<Product>? products;
     private Dictionary<int, string> categoryNames = new();
     private string message = string.Empty;
@@ -173,7 +175,41 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await InitializeSignalR();
         await LoadProducts(1);
+    }
+
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/producthub"))
+                .WithAutomaticReconnect()
+                .Build();
+
+            hubConnection.On<string, int>("ReceiveProductUpdate", async (action, productId) =>
+            {
+                Console.WriteLine($"Received product update: {action} for product {productId}");
+                await LoadProducts(products?.PageNumber ?? 1);
+                await InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+            Console.WriteLine("SignalR Connected");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SignalR Connection Error: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 
     private async Task ClearFilters()

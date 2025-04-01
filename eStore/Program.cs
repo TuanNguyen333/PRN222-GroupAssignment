@@ -1,6 +1,7 @@
 using eStore.Components;
 using Microsoft.EntityFrameworkCore;
 using eStore.Services;
+using eStore.Hubs;
 
 namespace eStore
 {
@@ -48,6 +49,8 @@ namespace eStore
                 client.Timeout = TimeSpan.FromSeconds(30);
             }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
 
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -66,6 +69,8 @@ namespace eStore
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+            app.MapHub<ProductHub>("/producthub");
 
             app.Run();
         }
