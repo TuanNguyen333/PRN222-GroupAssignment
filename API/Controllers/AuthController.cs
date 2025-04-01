@@ -1,8 +1,9 @@
-﻿using BusinessObjects.Dto.Auth;
+﻿using BusinessObjects.Base;
+using BusinessObjects.Dto.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
+using Services.Security;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -27,11 +28,7 @@ namespace API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var response = await _authService.LoginAsync(loginDto);
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-            return Ok(response);
+            return response.Success ? Ok(response) : BadRequest(response);
         }
 
         [Authorize]
@@ -41,26 +38,13 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Me()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
             {
-                return BadRequest("User ID claim not found.");
+                return BadRequest(ApiResponse<AuthenticationResponse>.ErrorResponse("Cannot parse User ID", new ErrorResponse("INTERNAL_SERVER_ERROR", "Cannot parse User ID")));
             }
-
-            if (!int.TryParse(userIdClaim.Value, out int userId))
-            {
-                return BadRequest("Invalid user ID claim.");
-            }
-
             var response = await _memberService.GetByIdAsync(userId);
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-            return Ok(response);
+            return response.Success ? Ok(response) : BadRequest(response);
         }
-
-
 
         //[HttpPost("register")]
         //[ProducesResponseType(StatusCodes.Status201Created)]

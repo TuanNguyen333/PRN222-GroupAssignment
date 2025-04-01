@@ -1,33 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Repositories.Implementation;
 using Repositories.Interface;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Serilog;
 using Microsoft.OpenApi.Models;
 using BusinessObjects.Entities;
 using Services.Interface;
 using Services.Implementation;
 using FluentValidation;
-using Validations;
-using BusinessObjects.Dto.Category;
 using Validations.Category;
-using BusinessObjects.Dto.Member;
-using BusinessObjects.Dto.Order;
-using BusinessObjects.Dto.Product;
 using Validations.Member;
 using Validations.Order;
 using Validations.Product;
-using Microsoft.AspNetCore.Authentication;
 using Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BusinessObjects.Dto.Auth;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.OpenApi.Any;
+using System.Security.Claims;
+using Services.Client.Cache;
 
 namespace API.Extensions
 {
@@ -41,7 +30,11 @@ namespace API.Extensions
 
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
+            // Authetication Services
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IPasswordService, BCryptPasswordService>();
+
+            // Bussiness Services
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IMemberService, MemberService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -54,6 +47,17 @@ namespace API.Extensions
         {
             services.AddDbContext<eStoreDBContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DBConnection")));
+            return services;
+        }
+
+        public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+                options.InstanceName = "SampleInstance";
+            });
+            services.AddScoped<ICacheService, RedisCacheService>();
             return services;
         }
 
@@ -150,8 +154,7 @@ namespace API.Extensions
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             // Bind JWT settings from configuration
-            var jwtSettings = new JwtSettings();
-            configuration.GetSection("JwtSettings").Bind(jwtSettings);
+            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
             // Add JWT authentication
@@ -174,6 +177,29 @@ namespace API.Extensions
                     ValidAudience = jwtSettings.Audience,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
+                };
+
+                // Custom Token Revocation Check
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var redisCacheService = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
+                        var rawToken = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+
+                        // Access claims directly from the ClaimsPrincipal
+                        var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
+                        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                        {
+                            context.Fail("Invalid user ID claim.");
+                            return;
+                        }
+
+                        if (!(await redisCacheService.IsInWhitelist(userId, rawToken)))
+                        {
+                            context.Fail("Token has been revoked.");
+                        }
+                    }
                 };
             });
 

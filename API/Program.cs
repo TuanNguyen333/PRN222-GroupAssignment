@@ -28,7 +28,8 @@ public class Program
             .AddCorsPolicy()
             .AddAutoMapper(typeof(MappingProfile))
             .AddSwagger()
-            .AddJwtAuthentication(builder.Configuration);
+            .AddJwtAuthentication(builder.Configuration)
+            .AddRedisCache(builder.Configuration);
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
