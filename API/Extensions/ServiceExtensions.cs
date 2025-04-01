@@ -101,11 +101,12 @@ namespace API.Extensions
                 // Add JWT authentication to Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description = "JWT Authorization. Enter your token only, 'Bearer' prefix will be added automatically",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -119,7 +120,7 @@ namespace API.Extensions
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        Array.Empty<string>()
                     }
                 });
             });
