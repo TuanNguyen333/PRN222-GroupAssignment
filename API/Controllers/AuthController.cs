@@ -32,6 +32,21 @@ namespace API.Controllers
         }
 
         [Authorize]
+        [HttpGet("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Logout()
+        {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId))
+            {
+                return BadRequest(ApiResponse<AuthenticationResponse>.ErrorResponse("Cannot parse User ID", new ErrorResponse("INTERNAL_SERVER_ERROR", "Cannot parse User ID")));
+            }
+            var response = await _authService.LogoutAsync(userId);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -11,5 +11,6 @@ namespace Services.Security
     public interface IAuthService
     {
         Task<ApiResponse<AuthenticationResponse>> LoginAsync(LoginDto login);
+        Task<ApiResponse<string>> LogoutAsync(int userId);
     }
 }

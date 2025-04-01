@@ -33,5 +33,11 @@ namespace Services.Security
             await _cacheService.SetAsync($"whitelist:{member.MemberId}", response.Token);
             return ApiResponse<AuthenticationResponse>.SuccessResponse(response, "Logged in successfully");
         }
+
+        public async Task<ApiResponse<string>> LogoutAsync(int userId)
+        {
+            await _cacheService.DeleteAsync($"whitelist:{userId}");
+            return ApiResponse<string>.SuccessResponse(null!, "Logged out successfully");
+        }
     }
 }
