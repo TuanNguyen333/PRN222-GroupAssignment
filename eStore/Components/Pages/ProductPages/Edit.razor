@@ -137,18 +137,7 @@
             }
 
             // Load product
-            var loadedProduct = await ProductService.GetProductByIdAsync(Id);
-            if (loadedProduct != null)
-            {
-                product = loadedProduct;
-                Logger.LogInformation("Successfully loaded product with ID {Id}", Id);
-            }
-            else
-            {
-                message = "Product not found.";
-                messageClass = "alert-warning";
-                Logger.LogWarning("Product with ID {Id} not found", Id);
-            }
+            await LoadProduct();
         }
         catch (HttpRequestException ex)
         {
@@ -161,10 +150,6 @@
             message = "An error occurred while loading data. Please try again later.";
             messageClass = "alert-danger";
             Logger.LogError(ex, "Unexpected error while loading data");
-        }
-        finally
-        {
-            isLoading = false;
         }
     }
 
@@ -183,34 +168,61 @@
         }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task LoadProduct()
     {
         try
         {
-            isSaving = true;
-            var updatedProduct = await ProductService.UpdateProductAsync(product);
-            if (updatedProduct != null)
+            isLoading = true;
+            var response = await ProductService.GetProductByIdAsync(Id);
+            
+            if (response?.Success == true && response.Data != null)
             {
-                message = "Product updated successfully!";
-                messageClass = "alert-success";
-                await Task.Delay(1000);
-                NavigationManager.NavigateTo("/products", true);
+                product = response.Data;
             }
             else
             {
-                message = "Failed to update product. Please try again.";
-                messageClass = "alert-danger";
+                message = response?.Message ?? "Failed to load product";
+                messageClass = "alert-warning";
             }
         }
         catch (Exception ex)
         {
-            message = $"Error updating product: {ex.Message}";
+            message = "An error occurred while loading the product.";
             messageClass = "alert-danger";
-            Logger.LogError(ex, "Error updating product");
+            Logger.LogError(ex, "Error loading product {ProductId}", Id);
         }
         finally
         {
-            isSaving = false;
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isLoading = true;
+            var response = await ProductService.UpdateProductAsync(Id, product);
+            
+            if (response?.Success == true && response.Data != null)
+            {
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                message = response?.Message ?? "Failed to update product";
+                messageClass = "alert-warning";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while updating the product.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error updating product {ProductId}", Id);
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 }

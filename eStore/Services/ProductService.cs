@@ -1,188 +1,253 @@
-using eStore.Models;
-using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
+using eStore.Models;
 
 namespace eStore.Services
 {
     public class ProductService : IProductService
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<ProductService> _logger;
-        private readonly JsonSerializerOptions _jsonOptions;
 
-        public ProductService(HttpClient httpClient, ILogger<ProductService> logger)
+        public ProductService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _logger = logger;
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
         }
 
-        public async Task<PagedResponse<Product>> GetAllProductsAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<ApiResponse<PagedResponse<Product>>> GetAllProductsAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? search = null,
+            decimal? minUnitPrice = null,
+            decimal? maxUnitPrice = null)
         {
             try
             {
-                _logger.LogInformation("Fetching products with pageNumber: {PageNumber}, pageSize: {PageSize}", pageNumber, pageSize);
-                
-                var response = await _httpClient.GetAsync($"api/products?pageNumber={pageNumber}&pageSize={pageSize}");
-                var content = await response.Content.ReadAsStringAsync();
-                
-                _logger.LogInformation("API Response: {StatusCode}, Content: {Content}", 
-                    response.StatusCode, content);
-
-                if (response.IsSuccessStatusCode)
+                var queryParams = new List<string>
                 {
-                    var result = JsonSerializer.Deserialize<ApiResponse<PagedResponse<Product>>>(content, _jsonOptions);
-                    
-                    if (result?.Data == null)
-                    {
-                        _logger.LogWarning("API returned null data");
-                        return new PagedResponse<Product> 
-                        { 
-                            Items = new List<Product>(),
-                            PageNumber = pageNumber,
-                            PageSize = pageSize
-                        };
-                    }
+                    $"pageNumber={pageNumber}",
+                    $"pageSize={pageSize}"
+                };
 
-                    _logger.LogInformation("Successfully retrieved {Count} products", result.Data.Items.Count);
-                    return result.Data;
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    queryParams.Add($"search={Uri.EscapeDataString(search)}");
+                }
+
+                if (minUnitPrice.HasValue)
+                {
+                    queryParams.Add($"minUnitPrice={minUnitPrice}");
+                }
+
+                if (maxUnitPrice.HasValue)
+                {
+                    queryParams.Add($"maxUnitPrice={maxUnitPrice}");
+                }
+
+                var url = $"api/products?{string.Join("&", queryParams)}";
+                Console.WriteLine($"Requesting URL: {url}");
+                
+                var response = await _httpClient.GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {content}");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"API returned error status code: {response.StatusCode}");
+                    return new ApiResponse<PagedResponse<Product>>
+                    {
+                        Success = false,
+                        Message = $"API returned error status code: {response.StatusCode}",
+                        Data = null,
+                        Errors = new[] { content }
+                    };
                 }
                 
-                _logger.LogError("API returned error status code: {StatusCode}", response.StatusCode);
-                throw new HttpRequestException($"API returned status code: {response.StatusCode}");
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                };
+                
+                var result = JsonSerializer.Deserialize<ApiResponse<PagedResponse<Product>>>(content, options);
+
+                if (result == null)
+                {
+                    Console.WriteLine("Failed to deserialize response");
+                    return new ApiResponse<PagedResponse<Product>>
+                    {
+                        Success = false,
+                        Message = "Failed to deserialize response",
+                        Data = null,
+                        Errors = new[] { "Invalid response format" }
+                    };
+                }
+
+                Console.WriteLine($"Success: {result.Success}, Message: {result.Message}");
+                if (result.Data != null)
+                {
+                    Console.WriteLine($"Total Items: {result.Data.TotalItems}, Total Pages: {result.Data.TotalPages}, Current Page: {result.Data.PageNumber}");
+                    if (result.Data.Items != null)
+                    {
+                        Console.WriteLine($"Items count: {result.Data.Items.Count}");
+                    }
+                }
+
+                // Nếu không có sản phẩm nào, trả về response thành công với danh sách rỗng
+                if (result.Data?.Items == null || !result.Data.Items.Any())
+                {
+                    result.Data = new PagedResponse<Product>
+                    {
+                        Items = new List<Product>(),
+                        PageNumber = pageNumber,
+                        PageSize = pageSize,
+                        TotalItems = 0,
+                        TotalPages = 1
+                    };
+                }
+
+                return result;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Network error while fetching products");
-                throw;
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Error deserializing API response");
-                throw;
+                Console.WriteLine($"HttpRequestException: {ex.Message}");
+                return new ApiResponse<PagedResponse<Product>>
+                {
+                    Success = false,
+                    Message = "Network error while fetching products",
+                    Data = null,
+                    Errors = new[] { ex.Message }
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error while fetching products");
-                throw;
+                Console.WriteLine($"Exception: {ex.Message}");
+                return new ApiResponse<PagedResponse<Product>>
+                {
+                    Success = false,
+                    Message = "Error retrieving products",
+                    Data = null,
+                    Errors = new[] { ex.Message }
+                };
             }
         }
 
-        public async Task<Product?> GetProductByIdAsync(int id)
+        public async Task<ApiResponse<Product>> GetProductByIdAsync(int id)
         {
             try
             {
                 var response = await _httpClient.GetAsync($"api/products/{id}");
                 response.EnsureSuccessStatusCode();
+
                 var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions
+                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content);
+
+                return result ?? new ApiResponse<Product>
                 {
-                    PropertyNameCaseInsensitive = true
-                });
-                
-                return result?.Data;
+                    Success = false,
+                    Message = "Failed to deserialize response",
+                    Data = null,
+                    Errors = new[] { "Invalid response format" }
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting product with ID {Id}", id);
-                throw;
+                return new ApiResponse<Product>
+                {
+                    Success = false,
+                    Message = "Error retrieving product",
+                    Data = null,
+                    Errors = new[] { ex.Message }
+                };
             }
         }
 
-        public async Task<Product?> CreateProductAsync(Product product)
+        public async Task<ApiResponse<Product>> CreateProductAsync(Product product)
         {
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/products", product);
                 response.EnsureSuccessStatusCode();
+
                 var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions
+                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content);
+
+                return result ?? new ApiResponse<Product>
                 {
-                    PropertyNameCaseInsensitive = true
-                });
-                
-                return result?.Data;
+                    Success = false,
+                    Message = "Failed to deserialize response",
+                    Data = null,
+                    Errors = new[] { "Invalid response format" }
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating product");
-                throw;
+                return new ApiResponse<Product>
+                {
+                    Success = false,
+                    Message = "Error creating product",
+                    Data = null,
+                    Errors = new[] { ex.Message }
+                };
             }
         }
 
-        public async Task<Product?> UpdateProductAsync(Product product)
+        public async Task<ApiResponse<Product>> UpdateProductAsync(int id, Product product)
         {
             try
             {
-                _logger.LogInformation("Sending update request: {Product}", JsonSerializer.Serialize(product));
-                var response = await _httpClient.PutAsJsonAsync($"api/products/{product.ProductId}", product);
+                var response = await _httpClient.PutAsJsonAsync($"api/products/{id}", product);
                 response.EnsureSuccessStatusCode();
+
                 var content = await response.Content.ReadAsStringAsync();
-                _logger.LogInformation("Update response: {Response}", content);
-                
-                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content, new JsonSerializerOptions
+                var result = JsonSerializer.Deserialize<ApiResponse<Product>>(content);
+
+                return result ?? new ApiResponse<Product>
                 {
-                    PropertyNameCaseInsensitive = true
-                });
-                
-                return result?.Data;
+                    Success = false,
+                    Message = "Failed to deserialize response",
+                    Data = null,
+                    Errors = new[] { "Invalid response format" }
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating product");
-                throw;
+                return new ApiResponse<Product>
+                {
+                    Success = false,
+                    Message = "Error updating product",
+                    Data = null,
+                    Errors = new[] { ex.Message }
+                };
             }
         }
 
-        public async Task<bool> DeleteProductAsync(int id)
+        public async Task<ApiResponse<bool>> DeleteProductAsync(int id)
         {
             try
             {
                 var response = await _httpClient.DeleteAsync($"api/products/{id}");
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
+                response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ApiResponse<string>>(content, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                var result = JsonSerializer.Deserialize<ApiResponse<bool>>(content);
 
-                if (result?.Errors?.Message != null)
+                return result ?? new ApiResponse<bool>
                 {
-                    throw new Exception(result.Errors.Message);
-                }
-
-                return false;
+                    Success = false,
+                    Message = "Failed to deserialize response",
+                    Data = false,
+                    Errors = new[] { "Invalid response format" }
+                };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting product with ID {Id}", id);
-                throw;
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Error deleting product",
+                    Data = false,
+                    Errors = new[] { ex.Message }
+                };
             }
         }
-    }
-
-    public class ApiResponse<T>
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public T? Data { get; set; }
-        public ErrorResponse? Errors { get; set; }
-    }
-
-    public class ErrorResponse
-    {
-        public string Code { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
     }
 } 

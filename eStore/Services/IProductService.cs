@@ -5,10 +5,15 @@ namespace eStore.Services
 {
     public interface IProductService
     {
-        Task<PagedResponse<Product>> GetAllProductsAsync(int pageNumber = 1, int pageSize = 10);
-        Task<Product?> GetProductByIdAsync(int id);
-        Task<Product?> CreateProductAsync(Product product);
-        Task<Product?> UpdateProductAsync(Product product);
-        Task<bool> DeleteProductAsync(int id);
+        Task<ApiResponse<PagedResponse<Product>>> GetAllProductsAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? search = null,
+            decimal? minUnitPrice = null,
+            decimal? maxUnitPrice = null);
+        Task<ApiResponse<Product>> GetProductByIdAsync(int id);
+        Task<ApiResponse<Product>> CreateProductAsync(Product product);
+        Task<ApiResponse<Product>> UpdateProductAsync(int id, Product product);
+        Task<ApiResponse<bool>> DeleteProductAsync(int id);
     }
 } 

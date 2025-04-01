@@ -75,7 +75,7 @@
                             <a href="/products" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Back to List
                             </a>
-                            <button class="btn btn-danger" @onclick="DeleteProduct" disabled="@isDeleting">
+                            <button class="btn btn-danger" @onclick="HandleDelete" disabled="@isDeleting">
                                 @if (isDeleting)
                                 {
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -110,31 +110,44 @@
     {
         try
         {
-            product = await ProductService.GetProductByIdAsync(Id);
+            await LoadProduct();
             if (product != null)
             {
                 var category = await CategoryService.GetCategoryByIdAsync(product.CategoryId);
                 categoryName = category?.CategoryName ?? $"Category {product.CategoryId}";
                 Logger.LogInformation("Successfully loaded product with ID {Id}", Id);
             }
-            else
-            {
-                message = "Product not found.";
-                messageClass = "alert-warning";
-                Logger.LogWarning("Product with ID {Id} not found", Id);
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            message = "Unable to connect to server. Please check your connection and try again.";
-            messageClass = "alert-danger";
-            Logger.LogError(ex, "Network error while loading data");
         }
         catch (Exception ex)
         {
-            message = "An error occurred while loading data. Please try again later.";
+            message = "An error occurred while loading the product.";
             messageClass = "alert-danger";
-            Logger.LogError(ex, "Unexpected error while loading data");
+            Logger.LogError(ex, "Error loading product {ProductId}", Id);
+        }
+    }
+
+    private async Task LoadProduct()
+    {
+        try
+        {
+            isLoading = true;
+            var response = await ProductService.GetProductByIdAsync(Id);
+            
+            if (response?.Success == true && response.Data != null)
+            {
+                product = response.Data;
+            }
+            else
+            {
+                message = response?.Message ?? "Failed to load product";
+                messageClass = "alert-warning";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading the product.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error loading product {ProductId}", Id);
         }
         finally
         {
@@ -142,34 +155,32 @@
         }
     }
 
-    private async Task DeleteProduct()
+    private async Task HandleDelete()
     {
         try
         {
-            isDeleting = true;
-            var result = await ProductService.DeleteProductAsync(Id);
-            if (result)
+            isLoading = true;
+            var response = await ProductService.DeleteProductAsync(Id);
+            
+            if (response?.Success == true && response.Data)
             {
-                message = "Product deleted successfully!";
-                messageClass = "alert-success";
-                await Task.Delay(1000);
-                NavigationManager.NavigateTo("/products", true);
+                NavigationManager.NavigateTo("/products");
             }
             else
             {
-                message = "Failed to delete product. Please try again.";
-                messageClass = "alert-danger";
+                message = response?.Message ?? "Failed to delete product";
+                messageClass = "alert-warning";
             }
         }
         catch (Exception ex)
         {
-            message = $"Error deleting product: {ex.Message}";
+            message = "An error occurred while deleting the product.";
             messageClass = "alert-danger";
-            Logger.LogError(ex, "Error deleting product");
+            Logger.LogError(ex, "Error deleting product {ProductId}", Id);
         }
         finally
         {
-            isDeleting = false;
+            isLoading = false;
         }
     }
 }
