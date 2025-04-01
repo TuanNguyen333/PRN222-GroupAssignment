@@ -1,4 +1,5 @@
 using eStore.Components;
+using eStore.Services;
 
 namespace eStore
 {
@@ -12,18 +13,29 @@ namespace eStore
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            // Configure HttpClient with auth handler
+            builder.Services.AddScoped<AuthenticationHeaderHandler>();
+            builder.Services.AddHttpClient("API", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7173/");
+            })
+            .AddHttpMessageHandler<AuthenticationHeaderHandler>();
+
+            // Add services
+            builder.Services.AddScoped<LocalStorageService>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<StateContainer>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseStaticFiles();
             app.UseAntiforgery();
 

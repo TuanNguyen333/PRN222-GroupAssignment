@@ -14,4 +14,8 @@
     <Folder Include="Components\Pages\OrderDetails\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj" />
+  </ItemGroup>
+
 </Project>
