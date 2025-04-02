@@ -1,5 +1,5 @@
 // eStore/Services/StateContainer.cs
-namespace eStore.Services
+namespace eStore.Services.Common
 {
     public class StateContainer
     {

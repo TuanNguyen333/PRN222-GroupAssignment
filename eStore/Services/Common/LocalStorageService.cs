@@ -2,7 +2,7 @@
 using Microsoft.JSInterop;
 using System.Text.Json;
 
-namespace eStore.Services
+namespace eStore.Services.Common
 {
     public class LocalStorageService
     {

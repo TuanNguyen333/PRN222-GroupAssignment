@@ -2,6 +2,8 @@ using eStore.Components;
 using Microsoft.EntityFrameworkCore;
 using eStore.Services;
 using eStore.Hubs;
+using eStore.Services.Auth;
+using eStore.Services.Common;
 
 namespace eStore
 {
@@ -79,8 +81,8 @@ namespace eStore
             .AddHttpMessageHandler<AuthenticationHeaderHandler>();
 
             // Add services
-            builder.Services.AddScoped<LocalStorageService>();
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<LocalStorageService>();
             builder.Services.AddScoped<StateContainer>();
 
             var app = builder.Build();

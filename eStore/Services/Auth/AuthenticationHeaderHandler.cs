@@ -1,7 +1,8 @@
 // eStore/Services/AuthenticationHeaderHandler.cs
+using eStore.Services.Common;
 using System.Net.Http.Headers;
 
-namespace eStore.Services
+namespace eStore.Services.Auth
 {
     public class AuthenticationHeaderHandler : DelegatingHandler
     {

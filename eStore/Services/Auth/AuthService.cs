@@ -2,8 +2,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BusinessObjects.Dto.Auth;
 using BusinessObjects.Base;
+using eStore.Services.Common;
 
-namespace eStore.Services
+namespace eStore.Services.Auth
 {
     public class AuthService
     {
