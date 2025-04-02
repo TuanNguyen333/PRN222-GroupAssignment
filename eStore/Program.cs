@@ -91,6 +91,7 @@ namespace eStore
 
             app.MapHub<ProductHub>("/producthub");
             app.MapHub<OrderHub>("/orderhub");
+            app.MapHub<MemberHub>("/memberhub");
 
             app.Run();
         }

@@ -1,0 +1,133 @@
+﻿@page "/members/details/{id:int}"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@rendermode InteractiveServer
+@inject IMemberService MemberService
+@inject NavigationManager NavigationManager
+@inject ILogger<Details> Logger
+
+<PageTitle>Member Details</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Member Details</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @messageClass" role="alert">
+                            @message
+                        </div>
+                    }
+
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (member == null)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading">Member Not Found</h4>
+                            <p>The member you're looking for could not be found.</p>
+                            <hr>
+                            <div class="d-flex gap-2">
+                                <a href="/members" class="btn btn-primary">Return to Members List</a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <dl class="row">
+                            <dt class="col-sm-3">Member ID</dt>
+                            <dd class="col-sm-9">@member.MemberId</dd>
+
+                            <dt class="col-sm-3">Email</dt>
+                            <dd class="col-sm-9">@member.Email</dd>
+
+                            <dt class="col-sm-3">Company Name</dt>
+                            <dd class="col-sm-9">@member.CompanyName</dd>
+
+                            <dt class="col-sm-3">City</dt>
+                            <dd class="col-sm-9">@member.City</dd>
+
+                            <dt class="col-sm-3">Country</dt>
+                            <dd class="col-sm-9">@member.Country</dd>
+                        </dl>
+
+                        <div class="mt-4 d-flex gap-2">
+                            <a href="/members" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                            <a href="/members/edit/@member.MemberId" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="/members/delete/@member.MemberId" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Member? member;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMember();
+    }
+
+    private async Task LoadMember()
+    {
+        try
+        {
+            isLoading = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+
+            Logger.LogInformation("Loading member details with ID: {Id}", Id);
+            member = await MemberService.GetMemberByIdAsync(Id);
+
+            if (member == null)
+            {
+                message = $"Member with ID {Id} not found.";
+                messageClass = "alert-warning";
+                Logger.LogWarning("Member not found. ID: {Id}", Id);
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading member details. ID: {Id}", Id);
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading the member details. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error loading member details. ID: {Id}", Id);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
