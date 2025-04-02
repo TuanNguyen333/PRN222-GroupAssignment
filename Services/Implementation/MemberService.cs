@@ -147,7 +147,7 @@ namespace Services.Implementation
                 memberEntity.MemberId = lastMember.Max(m => m.MemberId) + 1;
 
                 // Hash the password
-                memberEntity.Password = _passwordService.HashPassword(member.Password);
+                //memberEntity.Password = _passwordService.HashPassword(member.Password);
 
                 _unitOfWork.MemberRepository.Add(memberEntity);
                 await _unitOfWork.CommitTransactionAsync();
@@ -212,10 +212,10 @@ namespace Services.Implementation
                 _mapper.Map(member, existingMember);
 
                 // Hash the password if it's being updated
-                if (!string.IsNullOrEmpty(member.Password))
-                {
-                    existingMember.Password = _passwordService.HashPassword(member.Password);
-                }
+                // if (!string.IsNullOrEmpty(member.Password))
+                // {
+                //     existingMember.Password = _passwordService.HashPassword(member.Password);
+                // }
 
                 _unitOfWork.MemberRepository.Update(existingMember);
                 await _unitOfWork.CommitTransactionAsync();
