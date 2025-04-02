@@ -195,5 +195,134 @@ namespace Services.Implementation
                     new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message));
             }
         }
+
+        public async Task<PagedApiResponse<OrderDto>> GetAllAsync(
+    int? pageNumber = null,
+    int? pageSize = null,
+    decimal? minFreight = null,
+    decimal? maxFreight = null,
+    DateTime? minOrderDate = null,
+    DateTime? maxOrderDate = null)
+        {
+            try
+            {
+                // Validate input
+                if (pageNumber.HasValue && pageNumber < 1)
+                    return InvalidPageResponse("Page number must be greater than 0");
+
+                if (pageSize.HasValue && pageSize < 1)
+                    return InvalidPageResponse("Page size must be greater than 0");
+
+                if (minOrderDate.HasValue && maxOrderDate.HasValue && minOrderDate > maxOrderDate)
+                    return new PagedApiResponse<OrderDto>
+                    {
+                        Success = false,
+                        Message = "Min order date cannot be greater than max order date",
+                        Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid date range")
+                    };
+
+                if (minFreight.HasValue && maxFreight.HasValue && minFreight > maxFreight)
+                    return new PagedApiResponse<OrderDto>
+                    {
+                        Success = false,
+                        Message = "Min freight cannot be greater than max freight",
+                        Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid freight range")
+                    };
+
+                // Get all orders first
+                var allOrders = await GetAllOrdersWithPaginationFallback();
+
+                // Apply filters
+                var filteredOrders = ApplyFilters(allOrders, minOrderDate, maxOrderDate, minFreight, maxFreight);
+                var totalItems = filteredOrders.Count();
+
+                // Handle pagination
+                var (actualPageNumber, actualPageSize, pagedOrders) = ApplyPagination(
+                    filteredOrders, pageNumber, pageSize);
+
+                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(pagedOrders);
+
+                return PagedApiResponse<OrderDto>.SuccessPagedResponse(
+                    orderDtos,
+                    actualPageNumber,
+                    actualPageSize,
+                    totalItems,
+                    "Orders retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return new PagedApiResponse<OrderDto>
+                {
+                    Success = false,
+                    Message = "Failed to retrieve orders",
+                    Errors = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                };
+            }
+        }
+
+        private async Task<IEnumerable<Order>> GetAllOrdersWithPaginationFallback()
+        {
+            const int largePageSize = int.MaxValue;
+            return await _unitOfWork.OrderRepository.GetAllAsync(1, largePageSize);
+        }
+
+        private IEnumerable<Order> ApplyFilters(
+            IEnumerable<Order> orders,
+            DateTime? minOrderDate,
+            DateTime? maxOrderDate,
+            decimal? minFreight,
+            decimal? maxFreight)
+        {
+            var query = orders.AsQueryable();
+
+            if (minOrderDate.HasValue)
+            {
+                query = query.Where(o => o.OrderDate >= minOrderDate.Value);
+            }
+
+            if (maxOrderDate.HasValue)
+            {
+                query = query.Where(o => o.OrderDate <= maxOrderDate.Value);
+            }
+
+            if (minFreight.HasValue)
+            {
+                query = query.Where(o => o.Freight >= minFreight.Value);
+            }
+
+            if (maxFreight.HasValue)
+            {
+                query = query.Where(o => o.Freight <= maxFreight.Value);
+            }
+
+            return query.ToList();
+        }
+
+        private (int pageNumber, int pageSize, IEnumerable<Order> orders) ApplyPagination(
+            IEnumerable<Order> orders,
+            int? pageNumber,
+            int? pageSize)
+        {
+            var actualPageNumber = pageNumber ?? 1;
+            var actualPageSize = pageSize ?? orders.Count();
+
+            var pagedOrders = orders
+                .Skip((actualPageNumber - 1) * actualPageSize)
+                .Take(actualPageSize)
+                .ToList();
+
+            return (actualPageNumber, actualPageSize, pagedOrders);
+        }
+
+        private PagedApiResponse<OrderDto> InvalidPageResponse(string message)
+        {
+            return new PagedApiResponse<OrderDto>
+            {
+                Success = false,
+                Message = message,
+                Errors = new ErrorResponse("VALIDATION_ERROR", message)
+            };
+        }
+
     }
 }

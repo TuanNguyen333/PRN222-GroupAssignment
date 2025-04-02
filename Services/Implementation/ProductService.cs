@@ -28,51 +28,49 @@ namespace Services.Implementation
             _updateValidator = updateValidator ?? throw new ArgumentNullException(nameof(updateValidator));
         }
 
-        public async Task<PagedApiResponse<ProductDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null)
+        public async Task<PagedApiResponse<ProductDto>> GetAllAsync(
+    int? pageNumber = null,
+    int? pageSize = null,
+    string? search = null,
+    decimal? minUnitPrice = null,
+    decimal? maxUnitPrice = null)
         {
             try
             {
-                IEnumerable<Product> products;
-                int totalItems;
+                // Validate input
+                if (pageNumber.HasValue && pageNumber < 1)
+                    return InvalidPageResponse("Page number must be greater than 0");
 
-                if (!pageNumber.HasValue || !pageSize.HasValue)
-                {
-                    products = await _unitOfWork.ProductRepository.GetAllAsync(1, int.MaxValue);
-                    totalItems = products.Count();
-                    pageNumber = 1;
-                    pageSize = totalItems;
-                }
-                else
-                {
-                    if (pageNumber < 1)
-                        return new PagedApiResponse<ProductDto>
-                        {
-                            Success = false,
-                            Message = "Page number must be greater than 0",
-                            Errors = new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page number")
-                        };
+                if (pageSize.HasValue && pageSize < 1)
+                    return InvalidPageResponse("Page size must be greater than 0");
 
-                    if (pageSize < 1)
-                        return new PagedApiResponse<ProductDto>
-                        {
-                            Success = false,
-                            Message = "Page size must be greater than 0",
-                            Errors = new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page size")
-                        };
+                if (minUnitPrice.HasValue && maxUnitPrice.HasValue && minUnitPrice > maxUnitPrice)
+                    return new PagedApiResponse<ProductDto>
+                    {
+                        Success = false,
+                        Message = "Min price cannot be greater than max price",
+                        Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid price range")
+                    };
 
-                    products = await _unitOfWork.ProductRepository.GetAllAsync(pageNumber.Value, pageSize.Value);
-                    var allProducts = await _unitOfWork.ProductRepository.GetAllAsync(1, int.MaxValue);
-                    totalItems = allProducts.Count();
-                }
+                // Get all products first (since repository doesn't support parameterless GetAll)
+                var allProducts = await GetAllProductsWithPaginationFallback();
 
-                var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+                // Apply filters
+                var filteredProducts = ApplyFilters(allProducts, search, minUnitPrice, maxUnitPrice);
+                var totalItems = filteredProducts.Count();
+
+                // Handle pagination
+                var (actualPageNumber, actualPageSize, pagedProducts) = ApplyPagination(
+                    filteredProducts, pageNumber, pageSize);
+
+                var productDtos = _mapper.Map<IEnumerable<ProductDto>>(pagedProducts);
+
                 return PagedApiResponse<ProductDto>.SuccessPagedResponse(
                     productDtos,
-                    pageNumber.Value,
-                    pageSize.Value,
+                    actualPageNumber,
+                    actualPageSize,
                     totalItems,
-                    "Products retrieved successfully"
-                );
+                    "Products retrieved successfully");
             }
             catch (Exception ex)
             {
@@ -80,9 +78,68 @@ namespace Services.Implementation
                 {
                     Success = false,
                     Message = "Failed to retrieve products",
-                    Errors = new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                    Errors = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
                 };
             }
+        }
+
+        private async Task<IEnumerable<Product>> GetAllProductsWithPaginationFallback()
+        {
+            // Use a large page size to effectively get all products
+            const int largePageSize = int.MaxValue;
+            return await _unitOfWork.ProductRepository.GetAllAsync(1, largePageSize);
+        }
+
+        private (int pageNumber, int pageSize, IEnumerable<Product> products) ApplyPagination(
+            IEnumerable<Product> products,
+            int? pageNumber,
+            int? pageSize)
+        {
+            var actualPageNumber = pageNumber ?? 1;
+            var actualPageSize = pageSize ?? products.Count();
+
+            var pagedProducts = products
+                .Skip((actualPageNumber - 1) * actualPageSize)
+                .Take(actualPageSize)
+                .ToList();
+
+            return (actualPageNumber, actualPageSize, pagedProducts);
+        }
+
+        private IEnumerable<Product> ApplyFilters(
+            IEnumerable<Product> products,
+            string? search,
+            decimal? minUnitPrice,
+            decimal? maxUnitPrice)
+        {
+            var query = products.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p => p.ProductName.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (minUnitPrice.HasValue)
+            {
+                query = query.Where(p => p.UnitPrice >= minUnitPrice.Value);
+            }
+
+            if (maxUnitPrice.HasValue)
+            {
+                query = query.Where(p => p.UnitPrice <= maxUnitPrice.Value);
+            }
+
+            return query.ToList();
+        }
+
+        private PagedApiResponse<ProductDto> InvalidPageResponse(string message)
+        {
+            return new PagedApiResponse<ProductDto>
+            {
+                Success = false,
+                Message = message,
+                Errors = new ErrorResponse("VALIDATION_ERROR", message)
+            };
         }
 
         public async Task<ApiResponse<ProductDto>> CreateAsync(ProductForCreationDto product)

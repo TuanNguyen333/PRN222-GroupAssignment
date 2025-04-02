@@ -10,7 +10,12 @@ namespace Services.Interface
 {
     public interface IProductService
     {
-        Task<PagedApiResponse<ProductDto>> GetAllAsync(int? pageNumber = null, int? pageSize = null);
+        Task<PagedApiResponse<ProductDto>> GetAllAsync(
+        int? pageNumber = null,
+        int? pageSize = null,
+        string? search = null,
+        decimal? minUnitPrice = null,
+        decimal? maxUnitPrice = null);
         Task<ApiResponse<ProductDto>> CreateAsync(ProductForCreationDto product);
         Task<ApiResponse<ProductDto>> UpdateAsync(int id, ProductForUpdateDto product);
         Task<ApiResponse<string>> DeleteAsync(int id);

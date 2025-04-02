@@ -1,0 +1,218 @@
+﻿@page "/members/edit/{id:int}"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@using System.Text.Json
+@rendermode InteractiveServer
+@inject IMemberService MemberService
+@inject NavigationManager NavigationManager
+@inject ILogger<Edit> Logger
+
+<PageTitle>Edit Member</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Edit Member</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @messageClass" role="alert">
+                            @message
+                        </div>
+                    }
+
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (member == null)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading">Member Not Found</h4>
+                            <p>The member you're trying to edit could not be found.</p>
+                            <hr>
+                            <div class="d-flex gap-2">
+                                <a href="/members" class="btn btn-primary">Return to Members List</a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="@member" OnValidSubmit="@HandleValidSubmit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <InputText id="email" class="form-control" @bind-Value="member.Email" />
+                                <ValidationMessage For="@(() => member.Email)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="companyName" class="form-label">Company Name</label>
+                                <InputText id="companyName" class="form-control" @bind-Value="member.CompanyName" />
+                                <ValidationMessage For="@(() => member.CompanyName)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <InputText id="city" class="form-control" @bind-Value="member.City" />
+                                <ValidationMessage For="@(() => member.City)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <InputText id="country" class="form-control" @bind-Value="member.Country" />
+                                <ValidationMessage For="@(() => member.Country)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <InputText id="password" type="password" class="form-control" @bind-Value="member.Password" />
+                                <ValidationMessage For="@(() => member.Password)" />
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/members" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                                <button type="submit" class="btn btn-primary" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span class="ms-1">Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-save"></i>
+                                        <span class="ms-1">Save Changes</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Member? member;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+    private bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMember();
+    }
+
+    private async Task LoadMember()
+    {
+        try
+        {
+            isLoading = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+
+            Logger.LogInformation("Loading member with ID: {Id}", Id);
+            member = await MemberService.GetMemberByIdAsync(Id);
+
+            if (member == null)
+            {
+                message = $"Member with ID {Id} not found.";
+                messageClass = "alert-warning";
+                Logger.LogWarning("Member not found. ID: {Id}", Id);
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading member. ID: {Id}", Id);
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading the member. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error loading member. ID: {Id}", Id);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (member == null) return;
+
+        try
+        {
+            isSaving = true;
+
+            if (string.IsNullOrWhiteSpace(member.Email))
+            {
+                message = "Email is required.";
+                messageClass = "alert-warning";
+                return;
+            }
+
+            var result = await MemberService.UpdateMemberAsync(Id, member);
+            
+            if (result.Success)
+            {
+                message = "Member updated successfully!";
+                messageClass = "alert-success";
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/members", true);
+            }
+            else
+            {
+                message = result.Message ?? "Failed to update member. Please try again.";
+                messageClass = "alert-danger";
+                
+                if (result.Errors != null && result.Errors.Any())
+                {
+                    Logger.LogWarning("Member update errors: {Errors}", string.Join(", ", result.Errors));
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while updating member. ID: {Id}", Id);
+        }
+        catch (JsonException ex)
+        {
+            message = "Invalid data format. Please check your input and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "JSON error while updating member. ID: {Id}", Id);
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while updating the member. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error updating member. ID: {Id}", Id);
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

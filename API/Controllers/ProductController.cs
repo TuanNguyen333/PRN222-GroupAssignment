@@ -17,14 +17,19 @@ namespace API.Controllers
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
-        
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = null)
+        public async Task<IActionResult> GetAll(
+    [FromQuery] int? pageNumber = null,
+    [FromQuery] int? pageSize = null,
+    [FromQuery] string? search = null,
+    [FromQuery] decimal? minUnitPrice = null,
+    [FromQuery] decimal? maxUnitPrice = null)
         {
-            var response = await _productService.GetAllAsync(pageNumber, pageSize);
+            var response = await _productService.GetAllAsync(pageNumber, pageSize, search, minUnitPrice, maxUnitPrice);
             if (!response.Success)
             {
                 return BadRequest(response);
@@ -32,7 +37,7 @@ namespace API.Controllers
             return Ok(response);
         }
 
-       
+
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

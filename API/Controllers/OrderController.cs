@@ -17,19 +17,19 @@ namespace API.Controllers
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = null)
-        {
-            var response = await _orderService.GetAllAsync(pageNumber ?? 1, pageSize ?? 10);
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-            return Ok(response);
-        }
+        //[HttpGet]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> GetAll([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = null)
+        //{
+        //    var response = await _orderService.GetAllAsync(pageNumber ?? 1, pageSize ?? 10);
+        //    if (!response.Success)
+        //    {
+        //        return BadRequest(response);
+        //    }
+        //    return Ok(response);
+        //}
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -88,6 +88,26 @@ namespace API.Controllers
                 return NotFound(response);
             }
             return NoContent();
+        }
+
+        [HttpGet]
+[ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAll(
+    [FromQuery] int? pageNumber = null,
+    [FromQuery] int? pageSize = null,
+    [FromQuery] DateTime? minOrderDate = null,
+    [FromQuery] DateTime? maxOrderDate = null,
+    [FromQuery] decimal? minFreight = null,
+    [FromQuery] decimal? maxFreight = null)
+        {
+            var response = await _orderService.GetAllAsync(pageNumber, pageSize, minFreight, maxFreight, minOrderDate, maxOrderDate);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
     }
 }

@@ -1,0 +1,167 @@
+﻿@page "/products/delete/{id:int}"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@rendermode InteractiveServer
+@inject IProductService ProductService
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@inject ILogger<Delete> Logger
+
+<PageTitle>Delete Product</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Delete Product</h3>
+                </div>
+                <div class="card-body">
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (product == null)
+                    {
+                        <div class="alert alert-danger">Product not found.</div>
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(message))
+                        {
+                            <div class="alert @messageClass">@message</div>
+                        }
+
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading">Warning!</h4>
+                            <p>Are you sure you want to delete this product?</p>
+                            <hr>
+                            <p class="mb-0">This action cannot be undone.</p>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Product Details</h5>
+                                <dl class="row">
+                                    <dt class="col-sm-3">Product Name</dt>
+                                    <dd class="col-sm-9">@product.ProductName</dd>
+
+                                    <dt class="col-sm-3">Category</dt>
+                                    <dd class="col-sm-9">@categoryName</dd>
+
+                                    <dt class="col-sm-3">Weight</dt>
+                                    <dd class="col-sm-9">@product.Weight</dd>
+
+                                    <dt class="col-sm-3">Unit Price</dt>
+                                    <dd class="col-sm-9">@(product.UnitPrice.ToString("C"))</dd>
+
+                                    <dt class="col-sm-3">Units in Stock</dt>
+                                    <dd class="col-sm-9">@product.UnitsInStock</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-secondary" @onclick="GoBack">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </button>
+                            <button class="btn btn-danger" @onclick="HandleDelete">
+                                <i class="bi bi-trash"></i>
+                                <span class="ms-1">Delete Product</span>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product? product;
+    private string categoryName = string.Empty;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var productResponse = await ProductService.GetProductByIdAsync(Id);
+            if (productResponse.Success && productResponse.Data != null)
+            {
+                product = productResponse.Data;
+
+                if (product.CategoryId > 0)
+                {
+                    var categoryResponse = await CategoryService.GetCategoryByIdAsync(product.CategoryId);
+                    categoryName = categoryResponse?.CategoryName ?? "Unknown Category";
+                }
+            }
+            else
+            {
+                message = productResponse.Message ?? "Failed to load product";
+                messageClass = "alert-danger";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "Error loading data";
+            messageClass = "alert-danger";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleDelete()
+    {
+        try
+        {
+            isLoading = true;
+            var response = await ProductService.DeleteProductAsync(Id);
+            
+            if (response.Success && response.Data)
+            {
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                message = response.Message ?? "Failed to delete product";
+                messageClass = "alert-danger";
+                Console.WriteLine($"Delete failed: {message}");
+                if (response.Errors != null)
+                {
+                    Console.WriteLine($"Errors: {string.Join(", ", response.Errors)}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "Error deleting product";
+            messageClass = "alert-danger";
+            Console.WriteLine($"Delete error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+}
