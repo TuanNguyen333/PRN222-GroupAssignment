@@ -2,6 +2,8 @@
 using System.Text.Json;
 using eStore.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using eStore.Hubs;
 
 namespace eStore.Services
 {
@@ -10,11 +12,16 @@ namespace eStore.Services
         private readonly HttpClient _httpClient;
         private readonly ILogger<MemberService> _logger;
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly IHubContext<MemberHub> _hubContext;
 
-        public MemberService(HttpClient httpClient, ILogger<MemberService> logger)
+        public MemberService(
+            HttpClient httpClient, 
+            ILogger<MemberService> logger,
+            IHubContext<MemberHub> hubContext)
         {
             _httpClient = httpClient;
             _logger = logger;
+            _hubContext = hubContext;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -99,6 +106,265 @@ namespace eStore.Services
             {
                 _logger.LogError(ex, "Error fetching member with ID {Id}", id);
                 return null;
+            }
+        }
+
+        public async Task<ApiResponse<Member>> CreateMemberAsync(Member member)
+        {
+            try
+            {
+                if (member == null)
+                {
+                    return new ApiResponse<Member>
+                    {
+                        Success = false,
+                        Message = "Member cannot be null",
+                        Errors = new[] { "Invalid member data" }
+                    };
+                }
+
+                var response = await _httpClient.PostAsJsonAsync("api/members", member);
+                var result = await HandleResponse<Member>(response);
+                
+                if (result.Success && result.Data != null)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "create", result.Data.MemberId);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating member");
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = "Error creating member",
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
+        public async Task<ApiResponse<Member>> UpdateMemberAsync(int id, Member member)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/members/{id}", member);
+                var result = await HandleResponse<Member>(response);
+                
+                if (result.Success)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "update", id);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating member");
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = "Error updating member",
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
+        public async Task<ApiResponse<bool>> DeleteMemberAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/members/{id}");
+                var content = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Delete response content: {Content}", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Delete failed with status code: {StatusCode}", response.StatusCode);
+                    return new ApiResponse<bool>
+                    {
+                        Success = false,
+                        Message = $"API returned status code: {response.StatusCode}",
+                        Data = false,
+                        Errors = new[] { content }
+                    };
+                }
+
+                // If response is empty or not valid JSON, consider delete successful
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    var successResponse = new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Member deleted successfully",
+                        Data = true
+                    };
+
+                    // Send SignalR notification
+                    try
+                    {
+                        await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "delete", id);
+                        _logger.LogInformation("SignalR notification sent for delete. MemberId: {Id}", id);
+                    }
+                    catch (Exception signalREx)
+                    {
+                        _logger.LogError(signalREx, "Failed to send SignalR notification for delete. MemberId: {Id}", id);
+                    }
+
+                    return successResponse;
+                }
+
+                try 
+                {
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                    };
+
+                    var result = JsonSerializer.Deserialize<ApiResponse<bool>>(content, options);
+                    _logger.LogInformation("Delete result: Success={Success}, Message={Message}, Data={Data}", 
+                        result?.Success, result?.Message, result?.Data);
+
+                    if (result == null)
+                    {
+                        // If can't deserialize but status code is success, consider delete successful
+                        var successResponse = new ApiResponse<bool>
+                        {
+                            Success = true,
+                            Message = "Member deleted successfully",
+                            Data = true
+                        };
+
+                        // Send SignalR notification
+                        try
+                        {
+                            await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "delete", id);
+                            _logger.LogInformation("SignalR notification sent for delete. MemberId: {Id}", id);
+                        }
+                        catch (Exception signalREx)
+                        {
+                            _logger.LogError(signalREx, "Failed to send SignalR notification for delete. MemberId: {Id}", id);
+                        }
+
+                        return successResponse;
+                    }
+
+                    // If API returns success
+                    if (result.Success)
+                    {
+                        try
+                        {
+                            await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "delete", id);
+                            _logger.LogInformation("SignalR notification sent for delete. MemberId: {Id}", id);
+                        }
+                        catch (Exception signalREx)
+                        {
+                            _logger.LogError(signalREx, "Failed to send SignalR notification for delete. MemberId: {Id}", id);
+                        }
+                    }
+
+                    return result;
+                }
+                catch (JsonException jsonEx)
+                {
+                    // If can't parse JSON but status code is success, consider delete successful
+                    _logger.LogWarning(jsonEx, "Could not parse delete response as JSON, but status code indicates success");
+                    var successResponse = new ApiResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Member deleted successfully",
+                        Data = true
+                    };
+
+                    // Send SignalR notification
+                    try
+                    {
+                        await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "delete", id);
+                        _logger.LogInformation("SignalR notification sent for delete. MemberId: {Id}", id);
+                    }
+                    catch (Exception signalREx)
+                    {
+                        _logger.LogError(signalREx, "Failed to send SignalR notification for delete. MemberId: {Id}", id);
+                    }
+
+                    return successResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in delete operation for MemberId: {Id}", id);
+                return new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Error deleting member",
+                    Data = false,
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
+        private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            _logger.LogDebug("HandleResponse content: {Content}", content);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                return new ApiResponse<T>
+                {
+                    Success = false,
+                    Message = $"API returned status code: {response.StatusCode}",
+                    Errors = new[] { content }
+                };
+            }
+
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                };
+
+                var result = JsonSerializer.Deserialize<ApiResponse<T>>(content, options);
+                _logger.LogDebug("Deserialized result: Success={Success}, Message={Message}", 
+                    result?.Success, result?.Message);
+
+                if (result == null)
+                {
+                    return new ApiResponse<T>
+                    {
+                        Success = false,
+                        Message = "Failed to deserialize response",
+                        Errors = new[] { "Invalid response format" }
+                    };
+                }
+
+                return result;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON deserialization error: {Message}", ex.Message);
+                return new ApiResponse<T>
+                {
+                    Success = false,
+                    Message = "Error parsing response",
+                    Errors = new[] { ex.Message }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing response: {Message}", ex.Message);
+                return new ApiResponse<T>
+                {
+                    Success = false,
+                    Message = "Error processing response",
+                    Errors = new[] { ex.Message }
+                };
             }
         }
     }

@@ -8,5 +8,8 @@ namespace eStore.Services
     {
         Task<List<Member>> GetAllMembersAsync();
         Task<Member?> GetMemberByIdAsync(int id);
+        Task<ApiResponse<Member>> CreateMemberAsync(Member member);
+        Task<ApiResponse<Member>> UpdateMemberAsync(int id, Member member);
+        Task<ApiResponse<bool>> DeleteMemberAsync(int id);
     }
 }
