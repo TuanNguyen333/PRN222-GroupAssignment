@@ -1,0 +1,197 @@
+﻿@page "/products/create"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@using System.Text.Json
+@rendermode InteractiveServer
+@inject IProductService ProductService
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@inject ILogger<Create> Logger
+
+<PageTitle>Create Product</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create New Product</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @messageClass" role="alert">
+                            @message
+                        </div>
+                    }
+
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="@product" OnValidSubmit="@HandleValidSubmit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                <label for="productName" class="form-label">Product Name</label>
+                                <InputText id="productName" class="form-control" @bind-Value="product.ProductName" />
+                                <ValidationMessage For="@(() => product.ProductName)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoryId" class="form-label">Category</label>
+                                <InputSelect id="categoryId" class="form-select" @bind-Value="product.CategoryId">
+                                    <option value="0">Select category...</option>
+                                    @if (categories != null && categories.Any())
+                                    {
+                                        @foreach (var category in categories)
+                                        {
+                                            <option value="@category.CategoryId">@category.CategoryName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => product.CategoryId)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="weight" class="form-label">Weight</label>
+                                <InputText id="weight" class="form-control" @bind-Value="product.Weight" />
+                                <ValidationMessage For="@(() => product.Weight)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="unitPrice" class="form-label">Unit Price ($)</label>
+                                <InputNumber id="unitPrice" class="form-control" @bind-Value="product.UnitPrice" />
+                                <ValidationMessage For="@(() => product.UnitPrice)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="unitsInStock" class="form-label">Units in Stock</label>
+                                <InputNumber id="unitsInStock" class="form-control" @bind-Value="product.UnitsInStock" />
+                                <ValidationMessage For="@(() => product.UnitsInStock)" />
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/products" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                                <button type="submit" class="btn btn-primary" disabled="@(isSaving || !categories.Any())">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span class="ms-1">Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-save"></i>
+                                        <span class="ms-1">Create Product</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Product product = new() { ProductName = string.Empty, Weight = string.Empty };
+    private List<Category> categories = new();
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+    private bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            categories = await CategoryService.GetAllCategoriesAsync();
+            if (!categories.Any())
+            {
+                message = "Unable to load categories. Please try again later.";
+                messageClass = "alert-warning";
+                Logger.LogWarning("No categories found");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading categories");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading categories. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while loading categories");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isSaving = true;
+
+            if (product.CategoryId == 0)
+            {
+                message = "Please select a category.";
+                messageClass = "alert-warning";
+                return;
+            }
+
+            var createdProduct = await ProductService.CreateProductAsync(product);
+            if (createdProduct != null)
+            {
+                message = "Product created successfully!";
+                messageClass = "alert-success";
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/products", true);
+            }
+            else
+            {
+                message = "Failed to create product. Please try again.";
+                messageClass = "alert-danger";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while creating product");
+        }
+        catch (JsonException ex)
+        {
+            message = "Invalid data format. Please check your input and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "JSON error while creating product");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while creating the product. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while creating product");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}
+
