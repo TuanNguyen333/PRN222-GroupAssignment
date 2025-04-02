@@ -9005,23 +9005,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\HIEU\\.nuget\\packages\\": {},
+    "C:\\Users\\DELL\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Ass03Solution\\eStore\\eStore.csproj",
+      "projectUniqueName": "D:\\FPT\\2025\\PRN222-GroupAssignment\\eStore\\eStore.csproj",
       "projectName": "eStore",
-      "projectPath": "D:\\Ass03Solution\\eStore\\eStore.csproj",
-      "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-      "outputPath": "D:\\Ass03Solution\\eStore\\obj\\",
+      "projectPath": "D:\\FPT\\2025\\PRN222-GroupAssignment\\eStore\\eStore.csproj",
+      "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
+      "outputPath": "D:\\FPT\\2025\\PRN222-GroupAssignment\\eStore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -9030,17 +9030,18 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Users\\DELL\\.nuget\\packages": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-              "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj"
+            "D:\\FPT\\2025\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj": {
+              "projectPath": "D:\\FPT\\2025\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj"
             },
-            "D:\\Ass03Solution\\Repositories\\Repositories.csproj": {
-              "projectPath": "D:\\Ass03Solution\\Repositories\\Repositories.csproj"
+            "D:\\FPT\\2025\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj": {
+              "projectPath": "D:\\FPT\\2025\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj"
             }
           }
         }
