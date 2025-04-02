@@ -1,0 +1,206 @@
+﻿@page "/orders/create"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@using System.Text.Json
+@rendermode InteractiveServer
+@inject IOrderService OrderService
+@inject IMemberService MemberService
+@inject NavigationManager NavigationManager
+@inject ILogger<Create> Logger
+
+<PageTitle>Create Order</PageTitle>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Create New Order</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @messageClass" role="alert">
+                            @message
+                        </div>
+                    }
+
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="@order" OnValidSubmit="@HandleValidSubmit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                <label for="memberId" class="form-label">Member</label>
+                                <InputSelect id="memberId" class="form-select" @bind-Value="order.MemberId">
+                                    <option value="0">Select member...</option>
+                                    @if (members != null && members.Any())
+                                    {
+                                        @foreach (var member in members)
+                                        {
+                                            <option value="@member.MemberId">@member.CompanyName (@member.Email)</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => order.MemberId)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="orderDate" class="form-label">Order Date</label>
+                                <InputDate id="orderDate" class="form-control" @bind-Value="order.OrderDate" />
+                                <ValidationMessage For="@(() => order.OrderDate)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="requiredDate" class="form-label">Required Date</label>
+                                <InputDate id="requiredDate" class="form-control" @bind-Value="order.RequiredDate" />
+                                <ValidationMessage For="@(() => order.RequiredDate)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="shippedDate" class="form-label">Shipped Date</label>
+                                <InputDate id="shippedDate" class="form-control" @bind-Value="order.ShippedDate" />
+                                <ValidationMessage For="@(() => order.ShippedDate)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="freight" class="form-label">Freight ($)</label>
+                                <InputNumber id="freight" class="form-control" @bind-Value="order.Freight" />
+                                <ValidationMessage For="@(() => order.Freight)" />
+                            </div>
+
+                          
+
+                            <div class="d-flex justify-content-between">
+                                <a href="/orders" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                                <button type="submit" class="btn btn-primary" disabled="@(isSaving || !members.Any())">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span class="ms-1">Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-save"></i>
+                                        <span class="ms-1">Create Order</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Order order = new()
+    {
+        OrderDate = DateTime.Now,
+    };
+    private List<Member> members = new();
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+    private bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            members = await MemberService.GetAllMembersAsync();
+            if (!members.Any())
+            {
+                message = "Unable to load members. Please try again later.";
+                messageClass = "alert-warning";
+                Logger.LogWarning("No members found");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading members");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading members. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while loading members");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            isSaving = true;
+
+            if (order.MemberId <= 0)
+            {
+                message = "Please select a member.";
+                messageClass = "alert-warning";
+                return;
+            }
+
+            var response = await OrderService.CreateOrderAsync(order);
+            
+            if (response.Success && response.Data != null)
+            {
+                message = "Order created successfully!";
+                messageClass = "alert-success";
+                await Task.Delay(1000);
+                NavigationManager.NavigateTo("/orders", true);
+            }
+            else
+            {
+                message = response.Message ?? "Failed to create order. Please try again.";
+                messageClass = "alert-danger";
+                if (response.Errors != null)
+                {
+                    Logger.LogWarning("API Errors: {Errors}", string.Join(", ", response.Errors));
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while creating order");
+        }
+        catch (JsonException ex)
+        {
+            message = "Invalid data format. Please check your input and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "JSON error while creating order");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while creating the order. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while creating order");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}
