@@ -26,12 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
-=======
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
->>>>>>> 82a213bf91d8dce005b34d31ca4b30aaa60d7190
     <Compile Remove="Components\Pages\Categories\**" />
     <Compile Remove="Components\Pages\Members\**" />
     <Compile Remove="Components\Pages\OrderDetails\**" />
@@ -48,9 +45,6 @@
     <None Remove="Components\Pages\Members\**" />
     <None Remove="Components\Pages\OrderDetails\**" />
     <None Remove="Components\Pages\Orders\**" />
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.3" />

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ass03Solution\\eStore\\eStore.csproj": {}
+    "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\eStore\\eStore.csproj": {}
   },
   "projects": {
-    "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
+    "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj",
+        "projectUniqueName": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj",
         "projectName": "BusinessObjects",
-        "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\BusinessObjects\\obj\\",
+        "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj",
+        "packagesPath": "C:\\Users\\sugoi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sugoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Users\\sugoi\\.nuget\\packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -109,24 +111,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Ass03Solution\\eStore\\eStore.csproj": {
+    "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\eStore\\eStore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ass03Solution\\eStore\\eStore.csproj",
+        "projectUniqueName": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\eStore\\eStore.csproj",
         "projectName": "eStore",
-        "projectPath": "D:\\Ass03Solution\\eStore\\eStore.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\eStore\\obj\\",
+        "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\eStore\\eStore.csproj",
+        "packagesPath": "C:\\Users\\sugoi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\eStore\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sugoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -135,17 +137,19 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Users\\sugoi\\.nuget\\packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-                "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj"
+              "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj": {
+                "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj"
               },
-              "D:\\Ass03Solution\\Repositories\\Repositories.csproj": {
-                "projectPath": "D:\\Ass03Solution\\Repositories\\Repositories.csproj"
+              "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj": {
+                "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj"
               }
             }
           }
@@ -166,7 +170,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-<<<<<<< HEAD
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "Blazored.LocalStorage": {
               "target": "Package",
               "version": "[4.5.0, )"
@@ -174,11 +181,6 @@
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[9.0.3, )"
-=======
-            "BCrypt.Net-Next": {
-              "target": "Package",
-              "version": "[4.0.3, )"
->>>>>>> 82a213bf91d8dce005b34d31ca4b30aaa60d7190
             },
             "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": {
               "target": "Package",
@@ -232,24 +234,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Ass03Solution\\Repositories\\Repositories.csproj": {
+    "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ass03Solution\\Repositories\\Repositories.csproj",
+        "projectUniqueName": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj",
         "projectName": "Repositories",
-        "projectPath": "D:\\Ass03Solution\\Repositories\\Repositories.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\Repositories\\obj\\",
+        "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\Repositories.csproj",
+        "packagesPath": "C:\\Users\\sugoi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\Repositories\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sugoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -258,14 +260,16 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Users\\sugoi\\.nuget\\packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-                "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj"
+              "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj": {
+                "projectPath": "C:\\Users\\sugoi\\Desktop\\PRN222-GroupAssignment\\BusinessObjects\\BusinessObjects.csproj"
               }
             }
           }
@@ -309,59 +313,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
-    "D:\\Ass03Solution\\eStore\\eStore.csproj": {}
-    "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-        "projectUniqueName": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj",
-        "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\BusinessObjects\\obj\\",
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
-            "FluentValidation": {
-              "target": "Package",
-              "version": "[11.11.0, )"
-            },
-            "FluentValidation.AspNetCore": {
-              "target": "Package",
-              "version": "[11.3.0, )"
-            },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
-    "D:\\Ass03Solution\\eStore\\eStore.csproj": {
-        "projectUniqueName": "D:\\Ass03Solution\\eStore\\eStore.csproj",
-        "projectPath": "D:\\Ass03Solution\\eStore\\eStore.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\eStore\\obj\\",
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
-              "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-                "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj"
-              "D:\\Ass03Solution\\Repositories\\Repositories.csproj": {
-                "projectPath": "D:\\Ass03Solution\\Repositories\\Repositories.csproj"
-            "Blazored.LocalStorage": {
-              "target": "Package",
-              "version": "[4.5.0, )"
-            },
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[9.0.3, )"
-            },
-            "BCrypt.Net-Next": {
-              "target": "Package",
-              "version": "[4.0.3, )"
-            },
-            "Microsoft.EntityFrameworkCore.Sqlite": {
-              "target": "Package",
-              "version": "[9.0.3, )"
-            },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
-    "D:\\Ass03Solution\\Repositories\\Repositories.csproj": {
-        "projectUniqueName": "D:\\Ass03Solution\\Repositories\\Repositories.csproj",
-        "projectPath": "D:\\Ass03Solution\\Repositories\\Repositories.csproj",
-        "packagesPath": "C:\\Users\\HIEU\\.nuget\\packages\\",
-        "outputPath": "D:\\Ass03Solution\\Repositories\\obj\\",
-          "C:\\Users\\HIEU\\AppData\\Roaming\\NuGet\\NuGet.Config",
-              "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj": {
-                "projectPath": "D:\\Ass03Solution\\BusinessObjects\\BusinessObjects.csproj"
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
