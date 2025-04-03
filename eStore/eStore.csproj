@@ -7,13 +7,48 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Pages\Categories\" />
-    <Folder Include="Components\Pages\Members\" />
-    <Folder Include="Components\Pages\Orders\" />
-    <Folder Include="Components\Pages\OrderDetails\" />
+    <Compile Remove="Components\Pages\Categories\**" />
+    <Compile Remove="Components\Pages\Members\**" />
+    <Compile Remove="Components\Pages\OrderDetails\**" />
+    <Compile Remove="Components\Pages\Orders\**" />
+    <Content Remove="Components\Pages\Categories\**" />
+    <Content Remove="Components\Pages\Members\**" />
+    <Content Remove="Components\Pages\OrderDetails\**" />
+    <Content Remove="Components\Pages\Orders\**" />
+    <EmbeddedResource Remove="Components\Pages\Categories\**" />
+    <EmbeddedResource Remove="Components\Pages\Members\**" />
+    <EmbeddedResource Remove="Components\Pages\OrderDetails\**" />
+    <EmbeddedResource Remove="Components\Pages\Orders\**" />
+    <None Remove="Components\Pages\Categories\**" />
+    <None Remove="Components\Pages\Members\**" />
+    <None Remove="Components\Pages\OrderDetails\**" />
+    <None Remove="Components\Pages\Orders\**" />
   </ItemGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
+    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+=======
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+>>>>>>> 82a213bf91d8dce005b34d31ca4b30aaa60d7190
+    <Compile Remove="Components\Pages\Categories\**" />
+    <Compile Remove="Components\Pages\Members\**" />
+    <Compile Remove="Components\Pages\OrderDetails\**" />
+    <Compile Remove="Components\Pages\Orders\**" />
+    <Content Remove="Components\Pages\Categories\**" />
+    <Content Remove="Components\Pages\Members\**" />
+    <Content Remove="Components\Pages\OrderDetails\**" />
+    <Content Remove="Components\Pages\Orders\**" />
+    <EmbeddedResource Remove="Components\Pages\Categories\**" />
+    <EmbeddedResource Remove="Components\Pages\Members\**" />
+    <EmbeddedResource Remove="Components\Pages\OrderDetails\**" />
+    <EmbeddedResource Remove="Components\Pages\Orders\**" />
+    <None Remove="Components\Pages\Categories\**" />
+    <None Remove="Components\Pages\Members\**" />
+    <None Remove="Components\Pages\OrderDetails\**" />
+    <None Remove="Components\Pages\Orders\**" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="9.0.0" />
