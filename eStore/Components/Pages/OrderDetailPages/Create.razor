@@ -1,0 +1,54 @@
+﻿@page "/orderdetails/create"
+@using Microsoft.EntityFrameworkCore
+@using BusinessObjects.Entities
+@inject IDbContextFactory<BusinessObjects.Entities.eStoreDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>OrderDetail</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="OrderDetail" OnValidSubmit="AddOrderDetail" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="unitprice" class="form-label">UnitPrice:</label> 
+                <InputNumber id="unitprice" @bind-Value="OrderDetail.UnitPrice" class="form-control" /> 
+                <ValidationMessage For="() => OrderDetail.UnitPrice" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity:</label> 
+                <InputNumber id="quantity" @bind-Value="OrderDetail.Quantity" class="form-control" /> 
+                <ValidationMessage For="() => OrderDetail.Quantity" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="discount" class="form-label">Discount:</label> 
+                <InputNumber id="discount" @bind-Value="OrderDetail.Discount" class="form-control" /> 
+                <ValidationMessage For="() => OrderDetail.Discount" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/orderdetails">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private OrderDetail OrderDetail { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddOrderDetail()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.OrderDetails.Add(OrderDetail);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/orderdetails");
+    }
+}

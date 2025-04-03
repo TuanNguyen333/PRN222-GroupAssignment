@@ -20,6 +20,7 @@ using BusinessObjects.Dto.Product;
 using Validations.Member;
 using Validations.Order;
 using Validations.Product;
+using Validations.OrderDetail;
 
 namespace API.Extensions
 {
@@ -112,6 +113,10 @@ namespace API.Extensions
             services.AddValidatorsFromAssemblyContaining<ProductForUpdateValidator>();
             #endregion
 
+            #region OrderDetail
+            services.AddValidatorsFromAssemblyContaining<OrderDetailForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<OrderDetailForUpdateValidator>();
+            #endregion
             return services;
         }
     }

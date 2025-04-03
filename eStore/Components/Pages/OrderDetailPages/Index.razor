@@ -1,0 +1,164 @@
+﻿@page "/orderdetails"
+@using eStore.Models
+@using eStore.Services
+@inject IOrderDetailService OrderDetailService
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> Logger
+
+<PageTitle>Order Details</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h1>Order Details</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @messageClass" role="alert">
+            @message
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (orderDetails?.Data?.Items == null || !orderDetails.Data.Items.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No Order Details Found</h4>
+            <p>No order details are available in the system.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Product Name</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in orderDetails.Data.Items)
+                            {
+                                <tr>
+                                    <td>@item.OrderId</td>
+                                    <td>@item.OrderDto?.OrderDate.ToString("MM/dd/yyyy")</td>
+                                    <td>@item.ProductDto?.ProductName</td>
+                                    <td>@item.UnitPrice.ToString("C")</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Discount.ToString("P")</td>
+                                    <td>@((item.UnitPrice * item.Quantity * (1 - (decimal)item.Discount)).ToString("C"))</td>
+                                    <td>
+                                        <a class="btn btn-primary btn-sm" href="@($"orderdetails/details?orderid={item.OrderId}&productid={item.ProductId}")">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Showing @orderDetails.Data.Items.Count of @orderDetails.Data.TotalItems entries
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private ApiResponse<PagedResponse<OrderDetailDto>>? orderDetails;
+    private bool isLoading = true;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private const int MaxPageSize = 1000; // Very large page size to show all records
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllOrderDetails();
+    }
+
+    private async Task LoadAllOrderDetails()
+    {
+        try
+        {
+            isLoading = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+            StateHasChanged();
+
+            Console.WriteLine("Loading all order details without pagination");
+            
+            // Call API with large page size to effectively disable pagination
+            orderDetails = await OrderDetailService.GetAllAsync(
+                pageNumber: 1,
+                pageSize: MaxPageSize);
+
+            if (orderDetails == null)
+            {
+                message = "Failed to get response from server";
+                messageClass = "alert-danger";
+                Console.WriteLine("Response is null");
+                return;
+            }
+
+            if (!orderDetails.Success)
+            {
+                message = orderDetails.Message ?? "Failed to load order details";
+                messageClass = "alert-warning";
+                if (orderDetails.Errors != null)
+                {
+                    Console.WriteLine($"API Errors: {string.Join(", ", orderDetails.Errors)}");
+                }
+                return;
+            }
+
+            if (orderDetails.Data == null)
+            {
+                message = "No data received from server";
+                messageClass = "alert-warning";
+                Console.WriteLine("Response data is null");
+                return;
+            }
+
+            Console.WriteLine($"Loaded all {orderDetails.Data.TotalItems} order details");
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading order details");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading order details. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while loading order details");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}
