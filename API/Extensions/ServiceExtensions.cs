@@ -17,7 +17,7 @@ using System.Text;
 using BusinessObjects.Dto.Auth;
 using System.Security.Claims;
 using Services.Client.Cache;
-using StackExchange.Redis;
+using Validations.OrderDetail;
 
 namespace API.Extensions
 {
