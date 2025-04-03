@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Entities;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Impl;
 using Repositories.Interface;
 using System;
@@ -15,6 +16,10 @@ namespace Repositories.Implementation
         {
         }
 
+        public async Task<Member?> GetByEmailAsync(string email)
+        {
+            return await _dbSet.FirstOrDefaultAsync(m => m.Email == email);
+        }
     }
 }
 

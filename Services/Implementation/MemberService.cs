@@ -9,19 +9,22 @@ using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Member;
 using BusinessObjects.Entities;
+using Services.Security;
 
 namespace Services.Implementation
 {
     public class MemberService : IMemberService
     {
+        private readonly IPasswordService _passwordService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<MemberForCreationDto> _creationValidator;
         private readonly IValidator<MemberForUpdateDto> _updateValidator;
         private const int DEFAULT_PAGE_SIZE = 10;
 
-        public MemberService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<MemberForCreationDto> creationValidator, IValidator<MemberForUpdateDto> updateValidator)
+        public MemberService(IPasswordService passwordService, IUnitOfWork unitOfWork, IMapper mapper, IValidator<MemberForCreationDto> creationValidator, IValidator<MemberForUpdateDto> updateValidator)
         {
+            _passwordService = passwordService ?? throw new ArgumentNullException(nameof(passwordService));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _creationValidator = creationValidator ?? throw new ArgumentNullException(nameof(creationValidator));
@@ -101,6 +104,9 @@ namespace Services.Implementation
                 var lastMember = await _unitOfWork.MemberRepository.GetAllAsync(1, int.MaxValue);
                 memberEntity.MemberId = lastMember.Max(m => m.MemberId) + 1;
 
+                //// Hash the password
+                //memberEntity.Password = _passwordService.HashPassword(member.Password);
+
                 _unitOfWork.MemberRepository.Add(memberEntity);
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -139,6 +145,10 @@ namespace Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
 
                 _mapper.Map(member, existingMember);
+
+                //// Hash the password
+                //existingMember.Password = _passwordService.HashPassword(member.Password);
+
                 _unitOfWork.MemberRepository.Update(existingMember);
 
                 await _unitOfWork.CommitTransactionAsync();
