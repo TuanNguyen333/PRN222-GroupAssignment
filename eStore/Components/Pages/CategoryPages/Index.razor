@@ -1,0 +1,55 @@
+﻿@page "/categories"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using eStore.Models
+@using eStore.Services
+@inject ICategoryService CategoryService
+
+<PageTitle>Categories</PageTitle>
+
+<h1>Categories</h1>
+
+<p>
+    <a href="categories/create">Create New</a>
+</p>
+
+@if (categories == null)
+{
+    <p>Loading...</p>
+}
+else if (!categories.Any())
+{
+    <p>No categories found.</p>
+}
+else
+{
+    <QuickGrid Class="table" Items="@categories.AsQueryable()">
+        <PropertyColumn Property="category => category.CategoryName" Title="Category Name" />
+        <PropertyColumn Property="category => category.Description" Title="Description" />
+
+        <TemplateColumn Title="Actions" Context="category">
+            <a href="@($"categories/edit/{category.CategoryId}")">Edit</a> |
+            <a href="@($"categories/details/{category.CategoryId}")">Details</a> |
+            <a href="@($"categories/delete/{category.CategoryId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    private List<Category>? categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            categories = await CategoryService.GetAllCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            // Add proper error handling here
+            Console.WriteLine($"Error loading categories: {ex.Message}");
+            categories = new List<Category>();
+        }
+    }
+}

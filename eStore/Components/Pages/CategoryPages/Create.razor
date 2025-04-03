@@ -1,0 +1,91 @@
+﻿@page "/categories/create"
+@rendermode InteractiveServer
+@using eStore.Models
+@using eStore.Services
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Category</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Category</h2>
+<hr />
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Category" OnValidSubmit="AddCategory" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="categoryname" class="form-label">Category Name:</label>
+                <InputText id="categoryname" @bind-Value="Category.CategoryName" class="form-control" />
+                <ValidationMessage For="() => Category.CategoryName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label>
+                <InputText id="description" @bind-Value="Category.Description" class="form-control" />
+                <ValidationMessage For="() => Category.Description" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span> Creating...</span>
+                }
+                else
+                {
+                    <span>Create</span>
+                }
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="/categories" class="btn btn-secondary">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Category Category { get; set; } = new() { CategoryName = "" };
+
+    private bool isSubmitting = false;
+    private string? errorMessage = null;
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddCategory()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMessage = null;
+
+            var result = await CategoryService.CreateCategoryAsync(Category);
+
+            if (result != null)
+            {
+                NavigationManager.NavigateTo("/categories");
+            }
+            else
+            {
+                errorMessage = "Failed to create category. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
