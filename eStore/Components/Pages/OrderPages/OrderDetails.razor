@@ -1,0 +1,207 @@
+@page "/orders/{orderId:int}/details"
+@using eStore.Models
+@using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@using System.Globalization
+@rendermode InteractiveServer
+@inject IOrderDetailService OrderDetailService
+@inject IOrderService OrderService
+@inject NavigationManager NavigationManager
+@inject ILogger<OrderDetails> Logger
+
+<PageTitle>Order Details</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Order Details</h2>
+        <button class="btn btn-secondary" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i> Back
+        </button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @messageClass" role="alert">
+            @message
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (orderDetails?.Data == null || !orderDetails.Data.Items.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No Order Details Found</h4>
+            <p>No details found for this order.</p>
+        </div>
+    }
+    else
+    {
+        if (order != null)
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Order Information</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Order ID</dt>
+                                <dd class="col-sm-8">@order.OrderId</dd>
+                                <dt class="col-sm-4">Order Date</dt>
+                                <dd class="col-sm-8">@order.OrderDate.ToShortDateString()</dd>
+                                <dt class="col-sm-4">Required Date</dt>
+                                <dd class="col-sm-8">@(order.RequiredDate?.ToShortDateString() ?? "Not specified")</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Shipped Date</dt>
+                                <dd class="col-sm-8">@(order.ShippedDate?.ToShortDateString() ?? "Not shipped")</dd>
+                                <dt class="col-sm-4">Freight</dt>
+                                <dd class="col-sm-8">@(order.Freight?.ToString("C", CultureInfo.CurrentCulture))</dd>
+                                <dt class="col-sm-4">Member ID</dt>
+                                <dd class="col-sm-8">@order.MemberId</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Order Items</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in orderDetails.Data.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <div>@item.ProductDto?.ProductName</div>
+                                        <small class="text-muted">ID: @item.ProductId</small>
+                                    </td>
+                                    <td>@item.UnitPrice.ToString("C", CultureInfo.CurrentCulture)</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Discount.ToString("P", CultureInfo.CurrentCulture)</td>
+                                    <td>@((item.UnitPrice * item.Quantity * (1 - (decimal)item.Discount)).ToString("C", CultureInfo.CurrentCulture))</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold">Subtotal:</td>
+                                <td>@(orderDetails.Data.Items.Sum(item => item.UnitPrice * item.Quantity * (1 - (decimal)item.Discount)).ToString("C", CultureInfo.CurrentCulture))</td>
+                            </tr>
+                            @if (order?.Freight > 0)
+                            {
+                                var subtotal = orderDetails.Data.Items.Sum(item => item.UnitPrice * item.Quantity * (1 - (decimal)item.Discount));
+                                var total = subtotal + (order?.Freight ?? 0);
+                                <tr>
+                                    <td colspan="4" class="text-end">Freight:</td>
+                                    <td>@(order.Freight.Value.ToString("C", CultureInfo.CurrentCulture))</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td>@(total.ToString("C", CultureInfo.CurrentCulture))</td>
+                                </tr>
+                            }
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private ApiResponse<PagedResponse<OrderDetailDto>>? orderDetails;
+    private Order? order;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            // Load order details
+            orderDetails = await OrderDetailService.GetByOrderIdAsync(OrderId);
+            if (orderDetails == null)
+            {
+                message = "Failed to get response from server";
+                messageClass = "alert-danger";
+                Logger.LogError("Response is null when loading order details");
+                return;
+            }
+
+            if (!orderDetails.Success)
+            {
+                message = orderDetails.Message ?? "Failed to load order details";
+                messageClass = "alert-warning";
+                if (orderDetails.Errors != null)
+                {
+                    Logger.LogWarning("API Errors: {Errors}", orderDetails.Errors);
+                }
+                return;
+            }
+
+            // Load order information
+            var orderResponse = await OrderService.GetOrderByIdAsync(OrderId);
+            if (orderResponse?.Success == true && orderResponse.Data != null)
+            {
+                order = orderResponse.Data;
+            }
+            else
+            {
+                Logger.LogWarning("Could not load order information for OrderId: {OrderId}", OrderId);
+            }
+
+            Logger.LogInformation("Successfully loaded {Count} order details for order {OrderId}", 
+                orderDetails.Data?.Items.Count() ?? 0, OrderId);
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading the order details";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error loading order details for OrderId: {OrderId}", OrderId);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/orders/user");
+    }
+} 

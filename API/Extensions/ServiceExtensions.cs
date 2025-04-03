@@ -55,7 +55,7 @@ namespace API.Extensions
         {
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = "localhost:6379";
+                options.Configuration = configuration.GetConnectionString("RedisConnection");
                 options.InstanceName = "SampleInstance";
             });
             services.AddScoped<ICacheService, RedisCacheService>();

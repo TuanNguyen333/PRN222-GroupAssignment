@@ -100,5 +100,22 @@ namespace API.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("order/{orderId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetByOrderId(
+            int orderId,
+            [FromQuery] int? pageNumber = null,
+            [FromQuery] int? pageSize = null)
+        {
+            var response = await _orderDetailService.GetByOrderIdAsync(orderId, pageNumber, pageSize);
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
     }
 }

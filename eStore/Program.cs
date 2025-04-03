@@ -4,6 +4,9 @@ using eStore.Services;
 using eStore.Hubs;
 using eStore.Services.Auth;
 using eStore.Services.Common;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace eStore
 {
@@ -16,6 +19,22 @@ namespace eStore
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            // Add JWT authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = false,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             builder.Services.AddLogging(logging =>
             {
@@ -34,7 +53,6 @@ namespace eStore
             // Register services
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 
@@ -48,15 +66,6 @@ namespace eStore
 
             // Configure HttpClient for CategoryService
             builder.Services.AddHttpClient<ICategoryService, CategoryService>(client =>
-            {
-                client.BaseAddress = new Uri("https://localhost:7173/");
-                client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.Timeout = TimeSpan.FromSeconds(30);
-            }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
-
-
-            // Configure HttpClient for OrderService
-            builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7173/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -81,18 +90,22 @@ namespace eStore
 
             builder.Services.AddSignalR();
 
+            // Add core services first
+            builder.Services.AddSingleton<StateContainer>();
+            builder.Services.AddScoped<AuthService>();
+
             // Configure HttpClient with auth handler
             builder.Services.AddScoped<AuthenticationHeaderHandler>();
             builder.Services.AddHttpClient("API", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7173/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.Timeout = TimeSpan.FromSeconds(30);
             })
             .AddHttpMessageHandler<AuthenticationHeaderHandler>();
 
-            // Add services
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<LocalStorageService>();
-            builder.Services.AddScoped<StateContainer>();
+            // Register other services that depend on HttpClient
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             var app = builder.Build();
 
@@ -107,6 +120,10 @@ namespace eStore
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAntiforgery();
+
+            // Add authentication middleware
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();

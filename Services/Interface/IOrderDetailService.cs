@@ -20,5 +20,6 @@ namespace Services.Interface
         Task<ApiResponse<OrderDetailDto>> UpdateAsync(int id, OrderDetailForUpdateDto orderDetail);
         Task<ApiResponse<string>> DeleteAsync(int id);
         Task<ApiResponse<OrderDetailDto>> GetByIdAsync(int orderId, int productId);
+        Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null, int? pageSize = null);
     }
 }
