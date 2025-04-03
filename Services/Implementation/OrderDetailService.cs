@@ -9,6 +9,7 @@ using BusinessObjects.Dto.OrderDetail;
 using BusinessObjects.Dto.Product;
 using BusinessObjects.Entities;
 using FluentValidation;
+using OfficeOpenXml;
 using Repositories.Interface;
 using Services.Interface;
 
@@ -38,17 +39,20 @@ namespace Services.Implementation
         {
             var orderDetail = await _unitOfWork.OrderDetailRepository.GetByIdsAsync(orderId, productId);
             if (orderDetail == null)
-                return ApiResponse<OrderDetailDto>.ErrorResponse("Order detail not found", new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
+                return ApiResponse<OrderDetailDto>.ErrorResponse("Order detail not found",
+                    new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
 
             // Fetch related Order and Product by their IDs
             var order = await _unitOfWork.OrderRepository.GetByIdAsync(orderDetail.OrderId);
             var product = await _unitOfWork.ProductRepository.GetByIdAsync(orderDetail.ProductId);
 
             if (order == null)
-                return ApiResponse<OrderDetailDto>.ErrorResponse("Order not found", new ErrorResponse("NOT_FOUND", "Order does not exist"));
+                return ApiResponse<OrderDetailDto>.ErrorResponse("Order not found",
+                    new ErrorResponse("NOT_FOUND", "Order does not exist"));
 
             if (product == null)
-                return ApiResponse<OrderDetailDto>.ErrorResponse("Product not found", new ErrorResponse("NOT_FOUND", "Product does not exist"));
+                return ApiResponse<OrderDetailDto>.ErrorResponse("Product not found",
+                    new ErrorResponse("NOT_FOUND", "Product does not exist"));
 
             // Map Order and Product to DTOs
             var orderDto = _mapper.Map<OrderDto>(order);
@@ -68,7 +72,9 @@ namespace Services.Implementation
 
             return ApiResponse<OrderDetailDto>.SuccessResponse(orderDetailDto);
         }
-        public async Task<ApiResponse<OrderDetailForCreationResponseDto>> CreateAsync(OrderDetailForCreationDto orderDetail)
+
+        public async Task<ApiResponse<OrderDetailForCreationResponseDto>> CreateAsync(
+            OrderDetailForCreationDto orderDetail)
         {
             // Validate input
             var validationResult = await _creationValidator.ValidateAsync(orderDetail);
@@ -132,11 +138,14 @@ namespace Services.Implementation
         {
             var existingOrderDetail = await _unitOfWork.OrderDetailRepository.GetByIdAsync(id);
             if (existingOrderDetail == null)
-                return ApiResponse<OrderDetailDto>.ErrorResponse("Order detail not found", new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
+                return ApiResponse<OrderDetailDto>.ErrorResponse("Order detail not found",
+                    new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
 
             var validationResult = await _updateValidator.ValidateAsync(orderDetail);
             if (!validationResult.IsValid)
-                return ApiResponse<OrderDetailDto>.ErrorResponse("Validation failed", new ErrorResponse("VALIDATION_ERROR", string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
+                return ApiResponse<OrderDetailDto>.ErrorResponse("Validation failed",
+                    new ErrorResponse("VALIDATION_ERROR",
+                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))));
 
             await _unitOfWork.BeginTransactionAsync();
             _mapper.Map(orderDetail, existingOrderDetail);
@@ -151,7 +160,8 @@ namespace Services.Implementation
         {
             var orderDetail = await _unitOfWork.OrderDetailRepository.GetByIdAsync(id);
             if (orderDetail == null)
-                return ApiResponse<string>.ErrorResponse("Order detail not found", new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
+                return ApiResponse<string>.ErrorResponse("Order detail not found",
+                    new ErrorResponse("NOT_FOUND", "Order detail does not exist"));
 
             await _unitOfWork.BeginTransactionAsync();
             _unitOfWork.OrderDetailRepository.Delete(orderDetail);
@@ -161,14 +171,14 @@ namespace Services.Implementation
         }
 
         public async Task<PagedApiResponse<OrderDetailDto>> GetAllAsync(
-     int? pageNumber = null,
-     int? pageSize = null,
-     decimal? minUnitPrice = null,
-     decimal? maxUnitPrice = null,
-     int? minQuantity = null,
-     int? maxQuantity = null,
-     double? minDiscount = null,
-     double? maxDiscount = null)
+            int? pageNumber = null,
+            int? pageSize = null,
+            decimal? minUnitPrice = null,
+            decimal? maxUnitPrice = null,
+            int? minQuantity = null,
+            int? maxQuantity = null,
+            double? minDiscount = null,
+            double? maxDiscount = null)
         {
             try
             {
@@ -177,14 +187,17 @@ namespace Services.Implementation
                 int actualPageSize = pageSize ?? int.MaxValue;
 
                 // Fetch all order details
-                var allOrderDetails = await _unitOfWork.OrderDetailRepository.GetAllAsync(actualPageNumber, actualPageSize);
+                var allOrderDetails =
+                    await _unitOfWork.OrderDetailRepository.GetAllAsync(actualPageNumber, actualPageSize);
 
                 // Apply filters
-                var filteredOrderDetails = ApplyFilters(allOrderDetails, minUnitPrice, maxUnitPrice, minQuantity, maxQuantity, minDiscount, maxDiscount);
+                var filteredOrderDetails = ApplyFilters(allOrderDetails, minUnitPrice, maxUnitPrice, minQuantity,
+                    maxQuantity, minDiscount, maxDiscount);
                 var totalItems = filteredOrderDetails.Count();
 
                 // Handle pagination
-                var (finalPageNumber, finalPageSize, pagedOrderDetails) = ApplyPagination(filteredOrderDetails, actualPageNumber, actualPageSize);
+                var (finalPageNumber, finalPageSize, pagedOrderDetails) =
+                    ApplyPagination(filteredOrderDetails, actualPageNumber, actualPageSize);
 
                 // Map each OrderDetail to OrderDetailDto manually
                 var orderDetailDtos = new List<OrderDetailDto>();
@@ -196,9 +209,9 @@ namespace Services.Implementation
                     var orderDetailDto = new OrderDetailDto
                     {
                         OrderId = orderDetail.OrderId,
-                        OrderDto = _mapper.Map<OrderDto>(orderDto), 
+                        OrderDto = _mapper.Map<OrderDto>(orderDto),
                         ProductId = orderDetail.ProductId,
-                        ProductDto = _mapper.Map<ProductDto>(productDto), 
+                        ProductDto = _mapper.Map<ProductDto>(productDto),
                         UnitPrice = orderDetail.UnitPrice,
                         Quantity = orderDetail.Quantity,
                         Discount = orderDetail.Discount
@@ -286,5 +299,104 @@ namespace Services.Implementation
             };
         }
 
+        public async Task<MemoryStream> ExportOrderDetailsToExcelAsync(DateTime startDate, DateTime endDate)
+        {
+            // Set the license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            // Fetch order details based on date range
+            var orderDetails = await GetOrderDetailsDataAsync(startDate, endDate);
+
+            // Create Excel file
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("OrderDetails");
+
+            // Add headers
+            worksheet.Cells[1, 1].Value = "Order ID";
+            worksheet.Cells[1, 2].Value = "Product ID";
+            worksheet.Cells[1, 3].Value = "Unit Price";
+            worksheet.Cells[1, 4].Value = "Quantity";
+            worksheet.Cells[1, 5].Value = "Discount";
+            worksheet.Cells[1, 6].Value = "Order Date";
+            worksheet.Cells[1, 7].Value = "Required Date";
+            worksheet.Cells[1, 8].Value = "Shipped Date";
+            worksheet.Cells[1, 9].Value = "Freight";
+            worksheet.Cells[1, 10].Value = "Member ID";
+            worksheet.Cells[1, 11].Value = "Product Name";
+            worksheet.Cells[1, 12].Value = "Category ID";
+            worksheet.Cells[1, 13].Value = "Weight";
+            worksheet.Cells[1, 14].Value = "Product Unit Price";
+            worksheet.Cells[1, 15].Value = "Units In Stock";
+
+            // Set column widths
+            worksheet.Column(6).Width = 15; // Order Date
+            worksheet.Column(7).Width = 15; // Required Date
+            worksheet.Column(8).Width = 15; // Shipped Date
+
+            // Add data
+            for (int i = 0; i < orderDetails.Count; i++)
+            {
+                var orderDetail = orderDetails[i];
+                worksheet.Cells[i + 2, 1].Value = orderDetail.OrderId;
+                worksheet.Cells[i + 2, 2].Value = orderDetail.ProductId;
+                worksheet.Cells[i + 2, 3].Value = orderDetail.UnitPrice;
+                worksheet.Cells[i + 2, 4].Value = orderDetail.Quantity;
+                worksheet.Cells[i + 2, 5].Value = orderDetail.Discount;
+                worksheet.Cells[i + 2, 6].Value = orderDetail.OrderDto?.OrderDate;
+                worksheet.Cells[i + 2, 6].Style.Numberformat.Format = "dd-mm-yyyy";
+                worksheet.Cells[i + 2, 7].Value = orderDetail.OrderDto?.RequiredDate;
+                worksheet.Cells[i + 2, 7].Style.Numberformat.Format = "dd-mm-yyyy";
+                worksheet.Cells[i + 2, 8].Value = orderDetail.OrderDto?.ShippedDate;
+                worksheet.Cells[i + 2, 8].Style.Numberformat.Format = "dd-mm-yyyy";
+                worksheet.Cells[i + 2, 9].Value = orderDetail.OrderDto?.Freight;
+                worksheet.Cells[i + 2, 10].Value = orderDetail.OrderDto?.MemberId;
+                worksheet.Cells[i + 2, 11].Value = orderDetail.ProductDto?.ProductName;
+                worksheet.Cells[i + 2, 12].Value = orderDetail.ProductDto?.CategoryId;
+                worksheet.Cells[i + 2, 13].Value = orderDetail.ProductDto?.Weight;
+                worksheet.Cells[i + 2, 14].Value = orderDetail.ProductDto?.UnitPrice;
+                worksheet.Cells[i + 2, 15].Value = orderDetail.ProductDto?.UnitsInStock;
+            }
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return stream;
+        }
+
+        private async Task<List<OrderDetailDto>> GetOrderDetailsDataAsync(DateTime startDate, DateTime endDate)
+        {
+            var orderDetails = await _unitOfWork.OrderDetailRepository.GetAllAsync(1, int.MaxValue);
+            var filteredOrderDetails = orderDetails
+                .Where(od => od.Order.OrderDate >= startDate && od.Order.OrderDate <= endDate)
+                .Select(od => new OrderDetailDto
+                {
+                    OrderId = od.OrderId,
+                    ProductId = od.ProductId,
+                    UnitPrice = od.UnitPrice,
+                    Quantity = od.Quantity,
+                    Discount = od.Discount,
+                    OrderDto = new OrderDto
+                    {
+                        OrderId = od.Order.OrderId,
+                        OrderDate = od.Order.OrderDate,
+                        Freight = od.Order.Freight,
+                        MemberId = od.Order.MemberId,
+                        RequiredDate = od.Order.RequiredDate,
+                        ShippedDate = od.Order.ShippedDate
+                    },
+                    ProductDto = new ProductDto
+                    {
+                        ProductId = od.Product.ProductId,
+                        ProductName = od.Product.ProductName,
+                        CategoryId = od.Product.CategoryId,
+                        Weight = od.Product.Weight,
+                        UnitPrice = od.Product.UnitPrice,
+                        UnitsInStock = od.Product.UnitsInStock
+                    }
+                })
+                .ToList();
+            return filteredOrderDetails;
+        }
     }
 }
