@@ -109,5 +109,28 @@ namespace API.Controllers
             }
             return Ok(response);
         }
+        
+        
+        [HttpGet("export")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ExportSalesToExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            try
+            {
+                var stream = await _orderService.ExportSalesToExcelAsync(startDate, endDate);
+                var content = stream.ToArray();
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = $"SalesData_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+
+                return File(content, contentType, fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        
     }
 }

@@ -9,6 +9,7 @@ using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Order;
 using BusinessObjects.Entities;
+using OfficeOpenXml;
 
 namespace Services.Implementation
 {
@@ -260,6 +261,69 @@ namespace Services.Implementation
             }
         }
 
+       
+        public async Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate)
+        {
+            // Set the license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            // Fetch sales data based on date range
+            var salesData = await GetSalesDataAsync(startDate, endDate);
+
+            // Create Excel file
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("SalesData");
+
+            // Add headers
+            worksheet.Cells[1, 1].Value = "Order ID";
+            worksheet.Cells[1, 2].Value = "Order Date";
+            worksheet.Cells[1, 3].Value = "Freight";
+            worksheet.Cells[1, 4].Value = "Member ID";
+            worksheet.Cells[1, 5].Value = "Required Date";
+            worksheet.Cells[1, 6].Value = "Shipped Date";
+
+            // Set column widths
+            worksheet.Column(2).Width = 15; // Order Date
+            worksheet.Column(5).Width = 15; // Required Date
+            worksheet.Column(6).Width = 15; // Shipped Date
+
+            // Add data
+            for (int i = 0; i < salesData.Count; i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = salesData[i].OrderId;
+                worksheet.Cells[i + 2, 2].Value = salesData[i].OrderDate;
+                worksheet.Cells[i + 2, 2].Style.Numberformat.Format = "yyyy-mm-dd";
+                worksheet.Cells[i + 2, 3].Value = salesData[i].Freight;
+                worksheet.Cells[i + 2, 4].Value = salesData[i].MemberId;
+                worksheet.Cells[i + 2, 5].Value = salesData[i].RequiredDate;
+                worksheet.Cells[i + 2, 5].Style.Numberformat.Format = "yyyy-mm-dd";
+                worksheet.Cells[i + 2, 6].Value = salesData[i].ShippedDate;
+                worksheet.Cells[i + 2, 6].Style.Numberformat.Format = "yyyy-mm-dd";
+            }
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return stream;
+        }
+        private async Task<List<OrderDto>> GetSalesDataAsync(DateTime startDate, DateTime endDate)
+        {
+            var orders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
+            var filteredOrders = orders
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .Select(o => new OrderDto
+                {
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate,
+                    Freight = o.Freight,
+                    MemberId = o.MemberId,
+                    RequiredDate = o.RequiredDate,
+                    ShippedDate = o.ShippedDate
+                })
+                .ToList(); 
+            return filteredOrders;
+        }
         private async Task<IEnumerable<Order>> GetAllOrdersWithPaginationFallback()
         {
             const int largePageSize = int.MaxValue;

@@ -19,5 +19,6 @@ namespace Services.Interface
            decimal? maxFreight = null,
            DateTime? minOrderDate = null,
            DateTime? maxOrderDate = null);
+        Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate);
     }
 }
