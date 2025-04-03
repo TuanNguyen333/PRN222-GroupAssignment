@@ -17,7 +17,7 @@ using System.Text;
 using BusinessObjects.Dto.Auth;
 using System.Security.Claims;
 using Services.Client.Cache;
-using Validations.OrderDetail;
+using StackExchange.Redis;
 
 namespace API.Extensions
 {
@@ -53,13 +53,27 @@ namespace API.Extensions
 
         public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddStackExchangeRedisCache(options =>
+            try
             {
-                options.Configuration = "localhost:6379";
-                options.InstanceName = "SampleInstance";
-            });
-            services.AddScoped<ICacheService, RedisCacheService>();
-            return services;
+                var redisConnection = configuration.GetConnectionString("RedisConnection");
+                if (string.IsNullOrEmpty(redisConnection))
+                {
+                    throw new ArgumentException("Redis connection string is not configured");
+                }
+
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = redisConnection;
+                    options.InstanceName = "SampleInstance";
+                });
+                
+                services.AddScoped<ICacheService, RedisCacheService>();
+                return services;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to configure Redis Cache", ex);
+            }
         }
 
         public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
