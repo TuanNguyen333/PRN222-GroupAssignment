@@ -11,6 +11,6 @@ namespace Repositories.Interface
     public interface IOrderDetailRepository : IRepositoryBase<OrderDetail, int>
     {
         Task<OrderDetail> GetByIdsAsync(int orderId, int productId);
-        
+        Task<IEnumerable<OrderDetail>> GetByOrderIdAsync(int orderId);
     }
 }

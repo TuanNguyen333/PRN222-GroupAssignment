@@ -1,0 +1,323 @@
+@page "/orders/user"
+@using eStore.Models
+@using eStore.Services
+@using eStore.Services.Common
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Extensions.Logging
+@using eStore.Components
+@rendermode InteractiveServer
+@inject IOrderService OrderService
+@inject NavigationManager NavigationManager
+@inject ILogger<UserOrders> Logger
+@inject StateContainer StateContainer
+
+<PageTitle>My Orders</PageTitle>
+
+<div class="container mt-4">
+    <h2>My Orders</h2>
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (orders?.Items == null || !orders.Items.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No Orders Found</h4>
+            <p>We couldn't find any orders matching your search criteria.</p>
+            <hr>
+            <p class="mb-0">
+                Try these suggestions:
+                <ul class="mb-0">
+                    <li>Adjust the date range</li>
+                    <li>Try adjusting the freight range</li>
+                    <li>Clear all filters and try again</li>
+                    <li>Check if you have any orders in the system</li>
+                </ul>
+            </p>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="@this" OnValidSubmit="ApplyFilters">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">From Date</span>
+                        <InputDate TValue="DateTime?" class="form-control" @bind-Value="minOrderDate" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">To Date</span>
+                        <InputDate TValue="DateTime?" class="form-control" @bind-Value="maxOrderDate" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Min Freight</span>
+                        <InputNumber TValue="decimal?" class="form-control" @bind-Value="minFreight" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Max Freight</span>
+                        <InputNumber TValue="decimal?" class="form-control" @bind-Value="maxFreight" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="ClearFilters">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert @messageClass" role="alert">@message</div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Required Date</th>
+                        <th>Shipped Date</th>
+                        <th>Freight</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in orders.Items)
+                    {
+                        <tr>
+                            <td>@order.OrderId</td>
+                            <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                            <td>@order.RequiredDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.ShippedDate?.ToString("yyyy-MM-dd")</td>
+                            <td>@order.Freight?.ToString("C")</td>
+                            <td>
+                                <button class="btn btn-info btn-sm" @onclick="() => ViewOrderDetails(order.OrderId)">
+                                    <i class="bi bi-eye"></i> View Details
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (orders.TotalPages > 1)
+        {
+            <nav aria-label="Order pagination">
+                <ul class="pagination justify-content-center">
+                    @if (orders.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <button type="button" class="page-link" @onclick="async () => await LoadOrders(orders.PageNumber - 1)">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </button>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= orders.TotalPages; i++)
+                    {
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == orders.PageNumber ? "active" : "")">
+                            <button type="button" class="page-link" @onclick="async () => await LoadOrders(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+
+                    @if (orders.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <button type="button" class="page-link" @onclick="async () => await LoadOrders(orders.PageNumber + 1)">
+                                Next <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Showing @((orders.PageNumber - 1) * orders.PageSize + 1) to 
+                    @(Math.Min(orders.PageNumber * orders.PageSize, orders.TotalItems)) 
+                    of @orders.TotalItems orders
+                </small>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private HubConnection? hubConnection;
+    private PagedResponse<Order>? orders;
+    private string message = string.Empty;
+    private string messageClass = string.Empty;
+    private bool isLoading = true;
+    private DateTime? minOrderDate;
+    private DateTime? maxOrderDate;
+    private decimal? minFreight;
+    private decimal? maxFreight;
+    private const int PageSize = 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeSignalR();
+        await LoadOrders(1);
+    }
+
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/orderhub"))
+                .WithAutomaticReconnect()
+                .Build();
+
+            hubConnection.On<string, int>("ReceiveOrderUpdate", async (action, orderId) =>
+            {
+                Logger.LogInformation("Received order update: {Action} for order {OrderId}", action, orderId);
+                await LoadOrders(orders?.PageNumber ?? 1);
+                await InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+            Logger.LogInformation("SignalR Connected for Orders");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "SignalR Connection Error for Orders hub");
+            message = "Unable to connect to real-time updates.";
+            messageClass = "alert-warning";
+        }
+    }
+
+    private async Task LoadOrders(int page)
+    {
+        try
+        {
+            isLoading = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+            StateHasChanged();
+
+            Logger.LogInformation("Loading orders for page {Page}...", page);
+            
+            var response = await OrderService.GetUserOrdersAsync(
+                pageNumber: page,
+                pageSize: PageSize,
+                minFreight: minFreight,
+                maxFreight: maxFreight,
+                fromDate: minOrderDate,
+                toDate: maxOrderDate);
+
+            if (response == null)
+            {
+                message = "Failed to get response from server";
+                messageClass = "alert-danger";
+                Logger.LogWarning("Response is null");
+                return;
+            }
+
+            if (!response.Success)
+            {
+                message = response.Message ?? "Failed to load orders";
+                messageClass = "alert-warning";
+                if (response.Errors != null)
+                {
+                    Logger.LogWarning("API Errors: {Errors}", string.Join(", ", response.Errors));
+                }
+                return;
+            }
+
+            if (response.Data == null)
+            {
+                message = "No data received from server";
+                messageClass = "alert-warning";
+                Logger.LogWarning("Response data is null");
+                return;
+            }
+
+            orders = response.Data;
+            Logger.LogInformation("Loaded response with {TotalItems} total items, {TotalPages} total pages", 
+                orders.TotalItems, orders.TotalPages);
+
+            if (orders.Items == null || !orders.Items.Any())
+            {
+                message = "No orders found matching your search criteria.";
+                messageClass = "alert-info";
+                Logger.LogInformation("No items in response data");
+            }
+            else
+            {
+                Logger.LogInformation("Loaded {Count} orders on page {PageNumber} of {TotalPages}", 
+                    orders.Items.Count, orders.PageNumber, orders.TotalPages);
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            message = "Unable to connect to server. Please check your connection and try again.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Network error while loading orders");
+        }
+        catch (Exception ex)
+        {
+            message = "An error occurred while loading orders. Please try again later.";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Unexpected error while loading orders");
+        }
+        finally
+        {
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ApplyFilters()
+    {
+        Logger.LogInformation("Applying filters...");
+        await LoadOrders(1);
+    }
+
+    private async Task ClearFilters()
+    {
+        Logger.LogInformation("Clearing filters...");
+        minOrderDate = null;
+        maxOrderDate = null;
+        minFreight = null;
+        maxFreight = null;
+        await LoadOrders(1);
+    }
+
+    private void ViewOrderDetails(int orderId)
+    {
+        NavigationManager.NavigateTo($"/orders/{orderId}/details");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+} 

@@ -275,14 +275,76 @@ namespace Services.Implementation
             return (actualPageNumber, actualPageSize, pagedOrderDetails);
         }
 
-        // Invalid Page Response Helper
+        public async Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null, int? pageSize = null)
+        {
+            try
+            {
+                // Validate input
+                if (pageNumber.HasValue && pageNumber < 1)
+                    return InvalidPageResponse("Page number must be greater than 0");
+
+                if (pageSize.HasValue && pageSize < 1)
+                    return InvalidPageResponse("Page size must be greater than 0");
+
+                // Get all order details for the specified order
+                var orderDetails = await _unitOfWork.OrderDetailRepository.GetByOrderIdAsync(orderId);
+                if (orderDetails == null)
+                {
+                    return new PagedApiResponse<OrderDetailDto>
+                    {
+                        Success = false,
+                        Message = "Order details not found",
+                        Errors = new ErrorResponse("NOT_FOUND", "Order details do not exist")
+                    };
+                }
+
+                var totalItems = orderDetails.Count();
+
+                // Apply pagination
+                var actualPageNumber = pageNumber ?? 1;
+                var actualPageSize = pageSize ?? totalItems;
+
+                var pagedOrderDetails = orderDetails
+                    .Skip((actualPageNumber - 1) * actualPageSize)
+                    .Take(actualPageSize);
+
+                // Map to DTOs
+                var orderDetailDtos = pagedOrderDetails.Select(od => new OrderDetailDto
+                {
+                    OrderId = od.OrderId,
+                    OrderDto = _mapper.Map<OrderDto>(od.Order),
+                    ProductId = od.ProductId,
+                    ProductDto = _mapper.Map<ProductDto>(od.Product),
+                    UnitPrice = od.UnitPrice,
+                    Quantity = od.Quantity,
+                    Discount = od.Discount
+                });
+
+                return PagedApiResponse<OrderDetailDto>.SuccessPagedResponse(
+                    orderDetailDtos,
+                    actualPageNumber,
+                    actualPageSize,
+                    totalItems,
+                    "Order details retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return new PagedApiResponse<OrderDetailDto>
+                {
+                    Success = false,
+                    Message = "Failed to retrieve order details",
+                    Errors = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                };
+            }
+        }
+
         private PagedApiResponse<OrderDetailDto> InvalidPageResponse(string message)
         {
             return new PagedApiResponse<OrderDetailDto>
             {
                 Success = false,
                 Message = message,
-                Errors = new ErrorResponse("VALIDATION_ERROR", message)
+                Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid pagination parameters")
             };
         }
 

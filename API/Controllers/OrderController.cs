@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -91,18 +93,55 @@ namespace API.Controllers
         }
 
         [HttpGet]
-[ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll(
-    [FromQuery] int? pageNumber = null,
-    [FromQuery] int? pageSize = null,
-    [FromQuery] DateTime? minOrderDate = null,
-    [FromQuery] DateTime? maxOrderDate = null,
-    [FromQuery] decimal? minFreight = null,
-    [FromQuery] decimal? maxFreight = null)
+            [FromQuery] int? pageNumber = null,
+            [FromQuery] int? pageSize = null,
+            [FromQuery] DateTime? minOrderDate = null,
+            [FromQuery] DateTime? maxOrderDate = null,
+            [FromQuery] decimal? minFreight = null,
+            [FromQuery] decimal? maxFreight = null)
         {
             var response = await _orderService.GetAllAsync(pageNumber, pageSize, minFreight, maxFreight, minOrderDate, maxOrderDate);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet("user")]
+        [Authorize(Roles = "Member")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetOrdersByUser(
+            [FromQuery] int? pageNumber = null,
+            [FromQuery] int? pageSize = null,
+            [FromQuery] decimal? minFreight = null,
+            [FromQuery] decimal? maxFreight = null,
+            [FromQuery] DateTime? minOrderDate = null,
+            [FromQuery] DateTime? maxOrderDate = null)
+        {
+            // Lấy userId từ token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized(new { Message = "Invalid user ID in token" });
+            }
+
+            var response = await _orderService.GetOrdersByUserIdAsync(
+                userId,
+                pageNumber,
+                pageSize,
+                minFreight,
+                maxFreight,
+                minOrderDate,
+                maxOrderDate);
+
             if (!response.Success)
             {
                 return BadRequest(response);

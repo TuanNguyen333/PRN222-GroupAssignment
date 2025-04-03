@@ -18,11 +18,11 @@ namespace eStore.Services
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(
-            HttpClient httpClient,
+            IHttpClientFactory httpClientFactory,
             IHubContext<OrderHub> hubContext,
             ILogger<OrderService> logger)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("API");
             _hubContext = hubContext;
             _logger = logger;
         }
@@ -423,6 +423,87 @@ namespace eStore.Services
                     Success = false,
                     Message = "Error deleting order",
                     Data = false,
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
+        public async Task<ApiResponse<PagedResponse<Order>>> GetUserOrdersAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            decimal? minFreight = null,
+            decimal? maxFreight = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null)
+        {
+            try
+            {
+                var queryParams = new List<string>
+                {
+                    $"pageNumber={pageNumber}",
+                    $"pageSize={pageSize}"
+                };
+
+                if (minFreight.HasValue)
+                {
+                    queryParams.Add($"minFreight={minFreight}");
+                }
+
+                if (maxFreight.HasValue)
+                {
+                    queryParams.Add($"maxFreight={maxFreight}");
+                }
+
+                if (fromDate.HasValue)
+                {
+                    queryParams.Add($"minOrderDate={fromDate.Value:yyyy-MM-dd}");
+                }
+
+                if (toDate.HasValue)
+                {
+                    queryParams.Add($"maxOrderDate={toDate.Value:yyyy-MM-dd}");
+                }
+
+                var url = $"api/orders/user?{string.Join("&", queryParams)}";
+                _logger.LogInformation($"Requesting URL: {url}");
+
+                var response = await _httpClient.GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"Response content: {content}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning($"API returned error status code: {response.StatusCode}");
+                    return new ApiResponse<PagedResponse<Order>>
+                    {
+                        Success = false,
+                        Message = $"API returned error status code: {response.StatusCode}",
+                        Data = null,
+                        Errors = new[] { content }
+                    };
+                }
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var result = JsonSerializer.Deserialize<ApiResponse<PagedResponse<Order>>>(content, options);
+                return result ?? new ApiResponse<PagedResponse<Order>>
+                {
+                    Success = false,
+                    Message = "Failed to deserialize response",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user orders");
+                return new ApiResponse<PagedResponse<Order>>
+                {
+                    Success = false,
+                    Message = "Error getting user orders",
+                    Data = null,
                     Errors = new[] { ex.Message }
                 };
             }

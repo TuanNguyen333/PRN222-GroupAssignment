@@ -396,6 +396,56 @@ namespace eStore.Services
                 };
             }
         }
+
+        public async Task<ApiResponse<PagedResponse<OrderDetailDto>>> GetByOrderIdAsync(int orderId)
+        {
+            try
+            {
+                _logger.LogInformation("Getting order details for order {OrderId}", orderId);
+                var response = await _httpClient.GetAsync($"api/orderdetails/order/{orderId}");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Failed to get order details. Status code: {StatusCode}", response.StatusCode);
+                    return new ApiResponse<PagedResponse<OrderDetailDto>>
+                    {
+                        Success = false,
+                        Message = $"Failed to get order details. Status code: {response.StatusCode}",
+                        Errors = null
+                    };
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<ApiResponse<PagedResponse<OrderDetailDto>>>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (result == null)
+                {
+                    _logger.LogWarning("Failed to deserialize response");
+                    return new ApiResponse<PagedResponse<OrderDetailDto>>
+                    {
+                        Success = false,
+                        Message = "Failed to deserialize response",
+                        Errors = null
+                    };
+                }
+
+                _logger.LogInformation("Successfully retrieved order details for order {OrderId}", orderId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting order details for order {OrderId}", orderId);
+                return new ApiResponse<PagedResponse<OrderDetailDto>>
+                {
+                    Success = false,
+                    Message = "An error occurred while getting order details",
+                    Errors = null
+                };
+            }
+        }
     }
 }
 

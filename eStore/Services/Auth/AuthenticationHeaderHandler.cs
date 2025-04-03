@@ -15,13 +15,36 @@ namespace eStore.Services.Auth
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Use StateContainer instead of localStorage directly
-            if (_stateContainer.IsAuthenticated)
+            var token = _stateContainer.AuthToken;
+            Console.WriteLine($"Processing request to: {request.RequestUri}");
+            
+            if (!string.IsNullOrEmpty(token))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _stateContainer.AuthToken);
+                Console.WriteLine($"Adding auth token to request. Token length: {token.Length}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                
+                // Log all headers for debugging
+                foreach (var header in request.Headers)
+                {
+                    Console.WriteLine($"Header: {header.Key} = {string.Join(", ", header.Value)}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No auth token found in StateContainer");
             }
 
-            return await base.SendAsync(request, cancellationToken);
+            var response = await base.SendAsync(request, cancellationToken);
+            
+            Console.WriteLine($"Response status code: {response.StatusCode}");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Console.WriteLine("Received unauthorized response from API");
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Response content: {content}");
+            }
+
+            return response;
         }
     }
 }
