@@ -36,6 +36,7 @@ namespace eStore
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 
             // Configure HttpClient for ProductService
             builder.Services.AddHttpClient<IProductService, ProductService>(client =>
@@ -64,6 +65,14 @@ namespace eStore
 
             // Configure HttpClient for MemberService
             builder.Services.AddHttpClient<IMemberService, MemberService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.Timeout = TimeSpan.FromSeconds(30);
+            }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
+
+            // Configure HttpClient for OrderDetailService
+            builder.Services.AddHttpClient<IOrderDetailService, OrderDetailService>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7173/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");

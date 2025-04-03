@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Interface
 {
-    public interface IOrderDetailRepository 
+    public interface IOrderDetailRepository : IRepositoryBase<OrderDetail, int>
     {
-        Task<OrderDetail> GetByOrderAndProductIdAsync(int orderId, int productId);
+        Task<OrderDetail> GetByIdsAsync(int orderId, int productId);
+        
     }
 }

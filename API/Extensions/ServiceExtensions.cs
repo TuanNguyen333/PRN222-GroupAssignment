@@ -17,6 +17,7 @@ using System.Text;
 using BusinessObjects.Dto.Auth;
 using System.Security.Claims;
 using Services.Client.Cache;
+using Validations.OrderDetail;
 
 namespace API.Extensions
 {
@@ -148,6 +149,12 @@ namespace API.Extensions
             services.AddValidatorsFromAssemblyContaining<ProductForCreationValidator>();
             services.AddValidatorsFromAssemblyContaining<ProductForUpdateValidator>();
             #endregion
+            
+            #region OrderDetail
+            services.AddValidatorsFromAssemblyContaining<OrderDetailForCreationValidator>();
+            services.AddValidatorsFromAssemblyContaining<OrderDetailForUpdateValidator>();
+            #endregion
+            
 
             return services;
         }

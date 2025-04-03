@@ -44,13 +44,12 @@ namespace API.Extensions
             
             #region OrderDetail
             CreateMap<OrderDetail, OrderDetailDto>()
-                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
-                .ForMember(dest => dest.OrderDto, opt => opt.MapFrom(src => src.Order))
-                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
-                .ForMember(dest => dest.ProductDto, opt => opt.MapFrom(src => src.Product))
-                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.UnitPrice))
-                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount));
+                .ForMember(dest => dest.OrderDto, opt => opt.MapFrom(src => src.Order))  // Map Order
+                .ForMember(dest => dest.ProductDto, opt => opt.MapFrom(src => src.Product)); // Map Product
+            CreateMap<Order, OrderDto>();
+            CreateMap<Product, ProductDto>();
+            CreateMap<OrderDetailForCreationDto, OrderDetail>();
+            CreateMap<OrderDetailForUpdateDto, OrderDetail>();
             #endregion
         }
     }
