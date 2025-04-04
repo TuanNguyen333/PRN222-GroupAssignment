@@ -1,0 +1,33 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+- task: DownloadBuildArtifacts@1
+  inputs:
+    buildType: 'specific'
+    project: '25cee27a-6536-49b2-9187-12b7ab16329a'
+    pipeline: '3'
+    buildVersionToDownload: 'latest'
+    downloadType: 'specific'
+    artifactName: 'PRN222Artifact'
+    downloadPath: '$(Build.ArtifactsDirectory)'
+  
+- task: AzureWebApp@1
+  name: 'pushtoAzure'
+  inputs:
+    azureSubscription: 'Prod_Cuong'
+    appType: 'webApp'
+    appName: 'prn222'
+    package: '$(Build.ArtifactsDirectory)/PRN222Artifact/*.zip'
+    deploymentMethod: 'auto'
