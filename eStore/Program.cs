@@ -78,7 +78,9 @@ namespace eStore
                 client.BaseAddress = new Uri("https://localhost:7173/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
-            }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
+            })
+            .AddHttpMessageHandler<AuthenticationHeaderHandler>()
+            .ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
 
             // Configure HttpClient for OrderDetailService
             builder.Services.AddHttpClient<IOrderDetailService, OrderDetailService>(client =>

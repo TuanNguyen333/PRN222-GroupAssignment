@@ -3,6 +3,8 @@
 @using eStore.Services
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.Extensions.Logging
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
 @rendermode InteractiveServer
 @inject IMemberService MemberService
 @inject NavigationManager NavigationManager
@@ -53,7 +55,7 @@
                         </dl>
 
                         <div class="mt-4">
-                            <a href="/members/edit/@member.MemberId" class="btn btn-primary">
+                            <a href="/profile/edit" class="btn btn-primary">
                                 <i class="bi bi-pencil"></i> Edit Profile
                             </a>
                         </div>
@@ -69,10 +71,42 @@
     private string message = string.Empty;
     private string messageClass = string.Empty;
     private bool isLoading = true;
+    private HubConnection? hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadMemberInfo();
+        await InitializeSignalR();
+    }
+
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/memberhub"))
+                .WithAutomaticReconnect()
+                .Build();
+
+            hubConnection.On<string, int>("ReceiveMemberUpdate", async (action, memberId) =>
+            {
+                if (member != null && member.MemberId == memberId)
+                {
+                    Logger.LogInformation($"Received member update for ID {memberId}, action: {action}");
+                    await LoadMemberInfo();
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
+
+            await hubConnection.StartAsync();
+            Logger.LogInformation("SignalR connection started");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error initializing SignalR");
+            message = "Không thể kết nối đến server để nhận cập nhật realtime.";
+            messageClass = "alert-warning";
+        }
     }
 
     private async Task LoadMemberInfo()
@@ -113,6 +147,14 @@
         finally
         {
             isLoading = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
         }
     }
 } 
