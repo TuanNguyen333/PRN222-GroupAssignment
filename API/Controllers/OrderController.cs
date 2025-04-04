@@ -44,6 +44,7 @@ namespace API.Controllers
             {
                 return NotFound(response);
             }
+
             return Ok(response);
         }
 
@@ -58,6 +59,7 @@ namespace API.Controllers
             {
                 return BadRequest(response);
             }
+
             return CreatedAtAction(nameof(GetById), new { id = response.Data.OrderId }, response);
         }
 
@@ -75,6 +77,7 @@ namespace API.Controllers
                     return NotFound(response);
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
 
@@ -89,6 +92,7 @@ namespace API.Controllers
             {
                 return NotFound(response);
             }
+
             return NoContent();
         }
 
@@ -104,11 +108,13 @@ namespace API.Controllers
             [FromQuery] decimal? minFreight = null,
             [FromQuery] decimal? maxFreight = null)
         {
-            var response = await _orderService.GetAllAsync(pageNumber, pageSize, minFreight, maxFreight, minOrderDate, maxOrderDate);
+            var response = await _orderService.GetAllAsync(pageNumber, pageSize, minFreight, maxFreight, minOrderDate,
+                maxOrderDate);
             if (!response.Success)
             {
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
 
@@ -146,21 +152,22 @@ namespace API.Controllers
             {
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
-        
+
         [HttpGet("export")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ExportSalesToExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<IActionResult> ExportSalesToExcel()
         {
             try
             {
-                var stream = await _orderService.ExportSalesToExcelAsync(startDate, endDate);
+                var stream = await _orderService.ExportAllOrdersToExcelAsync();
                 var content = stream.ToArray();
                 var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                var fileName = $"SalesData_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+                var fileName = $"AllOrders_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
 
                 return File(content, contentType, fileName);
             }
@@ -169,7 +176,5 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
-
     }
 }
