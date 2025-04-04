@@ -16,13 +16,13 @@ steps:
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
-    project: '25cee27a-6536-49b2-9187-12b7ab16329a'
-    pipeline: '3'
+    project: 'b9d4f819-a1e5-4dc2-8e9f-71dd854a36e1'
+    pipeline: '5'
     buildVersionToDownload: 'latest'
     downloadType: 'specific'
     artifactName: 'PRN222Artifact'
     downloadPath: '$(Build.ArtifactsDirectory)'
-  
+    
 - task: AzureWebApp@1
   name: 'pushtoAzure'
   inputs:
