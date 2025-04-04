@@ -28,26 +28,6 @@ public partial class eStoreDBContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(getConnectString());
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    }
-
-    private string getConnectString()
-    {
-        IConfiguration config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true, true)
-            .Build();
-
-        string connectionString = config.GetConnectionString("DBConnection");
-
-        Console.WriteLine("Using Connection String: " + connectionString); 
-
-        return connectionString;
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>(entity =>
