@@ -3,33 +3,113 @@ namespace eStore.Services.Common
 {
     public class StateContainer
     {
-        public string AuthToken { get; set; }
-        public long ExpirationTime { get; set; }
-        public bool IsAuthenticated { get; private set; }
+        private string _authToken;
+        private long _expirationTime;
+        private string _userRole;
 
-        // Define the event for component notification
+        public string AuthToken
+        {
+            get => _authToken;
+            set
+            {
+                if (_authToken != value)
+                {
+                    _authToken = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
+        public long ExpirationTime
+        {
+            get => _expirationTime;
+            set
+            {
+                if (_expirationTime != value)
+                {
+                    _expirationTime = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
+        public string UserRole
+        {
+            get => _userRole;
+            private set
+            {
+                if (_userRole != value)
+                {
+                    _userRole = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
+        public bool IsAuthenticated
+        {
+            get => !string.IsNullOrEmpty(_authToken) &&
+                   DateTimeOffset.UtcNow.ToUnixTimeSeconds() < _expirationTime;
+        }
+
         public event Action OnChange;
 
-        public void SetAuthData(string token, long expirationTime)
+        public void SetAuthData(string token, long expirationTime, string role = "")
         {
-            AuthToken = token;
-            ExpirationTime = expirationTime;
-            IsAuthenticated = true;
-            NotifyStateChanged();
+            bool stateChanged = false;
+
+            if (_authToken != token)
+            {
+                _authToken = token;
+                stateChanged = true;
+            }
+
+            if (_expirationTime != expirationTime)
+            {
+                _expirationTime = expirationTime;
+                stateChanged = true;
+            }
+
+            if (_userRole != role)
+            {
+                _userRole = role;
+                stateChanged = true;
+            }
+
+            if (stateChanged)
+            {
+                NotifyStateChanged();
+            }
         }
 
         public void ClearAuthData()
         {
-            AuthToken = null;
-            ExpirationTime = 0;
-            IsAuthenticated = false;
-            NotifyStateChanged();
+            bool stateChanged = false;
+
+            if (_authToken != null)
+            {
+                _authToken = null;
+                stateChanged = true;
+            }
+
+            if (_expirationTime != 0)
+            {
+                _expirationTime = 0;
+                stateChanged = true;
+            }
+
+            if (_userRole != string.Empty)
+            {
+                _userRole = string.Empty;
+                stateChanged = true;
+            }
+
+            if (stateChanged)
+            {
+                NotifyStateChanged();
+            }
         }
 
-        private void NotifyStateChanged()
-        {
-            OnChange?.Invoke();
-        }
+        private void NotifyStateChanged() => OnChange?.Invoke();
     }
-
 }
