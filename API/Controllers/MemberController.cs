@@ -101,6 +101,31 @@ namespace API.Controllers
             return Ok(response);
         }
 
+        [HttpPut("user")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] MemberForUpdateDto member)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int memberId))
+            {
+                return Unauthorized(new { Success = false, Message = "Invalid user token" });
+            }
+
+            var response = await _memberService.UpdateAsync(memberId, member);
+            if (!response.Success)
+            {
+                if (response.Errors?.ErrorCode == "NOT_FOUND")
+                    return NotFound(response);
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

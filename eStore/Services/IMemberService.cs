@@ -12,5 +12,6 @@ namespace eStore.Services
         Task<ApiResponse<Member>> UpdateMemberAsync(int id, Member member);
         Task<ApiResponse<bool>> DeleteMemberAsync(int id);
         Task<ApiResponse<Member>> GetCurrentUserAsync();
+        Task<ApiResponse<Member>> UpdateCurrentUserAsync(Member member);
     }
 }
