@@ -4,6 +4,8 @@ using eStore.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
 using eStore.Hubs;
+using Microsoft.JSInterop;
+using eStore.Services.Common;
 
 namespace eStore.Services
 {
@@ -13,15 +15,21 @@ namespace eStore.Services
         private readonly ILogger<MemberService> _logger;
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly IHubContext<MemberHub> _hubContext;
+        private readonly IJSRuntime _jsRuntime;
+        private readonly StateContainer _stateContainer;
 
         public MemberService(
             HttpClient httpClient, 
             ILogger<MemberService> logger,
-            IHubContext<MemberHub> hubContext)
+            IHubContext<MemberHub> hubContext,
+            IJSRuntime jsRuntime,
+            StateContainer stateContainer)
         {
             _httpClient = httpClient;
             _logger = logger;
             _hubContext = hubContext;
+            _jsRuntime = jsRuntime;
+            _stateContainer = stateContainer;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -301,6 +309,101 @@ namespace eStore.Services
                     Success = false,
                     Message = "Error deleting member",
                     Data = false,
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
+        public async Task<ApiResponse<Member>> GetCurrentUserAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching current user information");
+
+                // Lấy token từ StateContainer
+                var token = _stateContainer.AuthToken;
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("No authentication token found");
+                    return new ApiResponse<Member>
+                    {
+                        Success = false,
+                        Message = "Not authenticated"
+                    };
+                }
+
+                // Thêm token vào header
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync("api/members/user");
+                var content = await response.Content.ReadAsStringAsync();
+                
+                _logger.LogInformation("Current user API Response Status: {StatusCode}", response.StatusCode);
+                _logger.LogDebug("Current user API Response Content: {Content}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<Member>>(content, _jsonOptions);
+                    if (apiResponse == null)
+                    {
+                        _logger.LogWarning("API returned null response for current user");
+                        return new ApiResponse<Member>
+                        {
+                            Success = false,
+                            Message = "Invalid response format"
+                        };
+                    }
+
+                    _logger.LogInformation("Successfully retrieved current user information");
+                    return apiResponse;
+                }
+                
+                _logger.LogError("Error fetching current user. Status: {StatusCode}, Content: {Content}", 
+                    response.StatusCode, content);
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = $"API returned status code: {response.StatusCode}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching current user information");
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = "Error fetching user information",
+                    Errors = new[] { ex.Message }
+                };
+            }
+            finally
+            {
+                // Xóa token khỏi header sau khi hoàn thành
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+            }
+        }
+
+        public async Task<ApiResponse<Member>> UpdateCurrentUserAsync(Member member)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync("api/members/user", member);
+                var result = await HandleResponse<Member>(response);
+                
+                if (result.Success && result.Data != null)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "update", result.Data.MemberId);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating current user");
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = "Error updating current user",
                     Errors = new[] { ex.Message }
                 };
             }

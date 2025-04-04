@@ -9,6 +9,7 @@ using Repositories.Interface;
 using Services.Interface;
 using BusinessObjects.Dto.Order;
 using BusinessObjects.Entities;
+using OfficeOpenXml;
 
 namespace Services.Implementation
 {
@@ -197,57 +198,49 @@ namespace Services.Implementation
         }
 
         public async Task<PagedApiResponse<OrderDto>> GetAllAsync(
-    int? pageNumber = null,
-    int? pageSize = null,
-    decimal? minFreight = null,
-    decimal? maxFreight = null,
-    DateTime? minOrderDate = null,
-    DateTime? maxOrderDate = null)
+           int? pageNumber = null,
+           int? pageSize = null,
+           decimal? minFreight = null,
+           decimal? maxFreight = null,
+           DateTime? minOrderDate = null,
+           DateTime? maxOrderDate = null)
         {
             try
             {
-                // Validate input
-                if (pageNumber.HasValue && pageNumber < 1)
-                    return InvalidPageResponse("Page number must be greater than 0");
+                pageNumber = pageNumber ?? 1;
+                pageSize = pageSize ?? DEFAULT_PAGE_SIZE;
 
-                if (pageSize.HasValue && pageSize < 1)
-                    return InvalidPageResponse("Page size must be greater than 0");
+                if (pageNumber < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page number must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page number"));
 
-                if (minOrderDate.HasValue && maxOrderDate.HasValue && minOrderDate > maxOrderDate)
-                    return new PagedApiResponse<OrderDto>
-                    {
-                        Success = false,
-                        Message = "Min order date cannot be greater than max order date",
-                        Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid date range")
-                    };
+                if (pageSize < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page size must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page size"));
 
-                if (minFreight.HasValue && maxFreight.HasValue && minFreight > maxFreight)
-                    return new PagedApiResponse<OrderDto>
-                    {
-                        Success = false,
-                        Message = "Min freight cannot be greater than max freight",
-                        Errors = new ErrorResponse("VALIDATION_ERROR", "Invalid freight range")
-                    };
-
-                // Get all orders first
-                var allOrders = await GetAllOrdersWithPaginationFallback();
+                var orders = await _unitOfWork.OrderRepository.GetAllAsync(pageNumber.Value, pageSize.Value);
+                var allOrders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
 
                 // Apply filters
-                var filteredOrders = ApplyFilters(allOrders, minOrderDate, maxOrderDate, minFreight, maxFreight);
-                var totalItems = filteredOrders.Count();
+                if (minOrderDate.HasValue)
+                    allOrders = allOrders.Where(o => o.OrderDate >= minOrderDate.Value);
+                if (maxOrderDate.HasValue)
+                    allOrders = allOrders.Where(o => o.OrderDate <= maxOrderDate.Value);
+                if (minFreight.HasValue)
+                    allOrders = allOrders.Where(o => o.Freight >= minFreight.Value);
+                if (maxFreight.HasValue)
+                    allOrders = allOrders.Where(o => o.Freight <= maxFreight.Value);
 
-                // Handle pagination
-                var (actualPageNumber, actualPageSize, pagedOrders) = ApplyPagination(
-                    filteredOrders, pageNumber, pageSize);
+                var totalItems = allOrders.Count();
 
-                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(pagedOrders);
-
+                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
                 return PagedApiResponse<OrderDto>.SuccessPagedResponse(
                     orderDtos,
-                    actualPageNumber,
-                    actualPageSize,
+                    pageNumber.Value,
+                    pageSize.Value,
                     totalItems,
-                    "Orders retrieved successfully");
+                    "Orders retrieved successfully"
+                );
             }
             catch (Exception ex)
             {
@@ -255,73 +248,125 @@ namespace Services.Implementation
                 {
                     Success = false,
                     Message = "Failed to retrieve orders",
-                    Errors = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                    Errors = new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
                 };
             }
         }
 
-        private async Task<IEnumerable<Order>> GetAllOrdersWithPaginationFallback()
+        public async Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate)
         {
-            const int largePageSize = int.MaxValue;
-            return await _unitOfWork.OrderRepository.GetAllAsync(1, largePageSize);
+            // Set the license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            // Fetch sales data based on date range
+            var salesData = await GetSalesDataAsync(startDate, endDate);
+
+            // Create Excel file
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("SalesData");
+
+            // Add headers
+            worksheet.Cells[1, 1].Value = "Order ID";
+            worksheet.Cells[1, 2].Value = "Order Date";
+            worksheet.Cells[1, 3].Value = "Freight";
+            worksheet.Cells[1, 4].Value = "Member ID";
+            worksheet.Cells[1, 5].Value = "Required Date";
+            worksheet.Cells[1, 6].Value = "Shipped Date";
+
+            // Set column widths
+            worksheet.Column(2).Width = 15; // Order Date
+            worksheet.Column(5).Width = 15; // Required Date
+            worksheet.Column(6).Width = 15; // Shipped Date
+
+            // Add data
+            for (int i = 0; i < salesData.Count; i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = salesData[i].OrderId;
+                worksheet.Cells[i + 2, 2].Value = salesData[i].OrderDate;
+                worksheet.Cells[i + 2, 2].Style.Numberformat.Format = "yyyy-mm-dd";
+                worksheet.Cells[i + 2, 3].Value = salesData[i].Freight;
+                worksheet.Cells[i + 2, 4].Value = salesData[i].MemberId;
+                worksheet.Cells[i + 2, 5].Value = salesData[i].RequiredDate;
+                worksheet.Cells[i + 2, 5].Style.Numberformat.Format = "yyyy-mm-dd";
+                worksheet.Cells[i + 2, 6].Value = salesData[i].ShippedDate;
+                worksheet.Cells[i + 2, 6].Style.Numberformat.Format = "yyyy-mm-dd";
+            }
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return stream;
         }
 
-        private IEnumerable<Order> ApplyFilters(
-            IEnumerable<Order> orders,
-            DateTime? minOrderDate,
-            DateTime? maxOrderDate,
-            decimal? minFreight,
-            decimal? maxFreight)
+       public async Task<PagedApiResponse<OrderDto>> GetOrdersByUserIdAsync(
+           int userId,
+           int? pageNumber = null,
+           int? pageSize = null,
+           decimal? minFreight = null,
+           decimal? maxFreight = null,
+           DateTime? minOrderDate = null,
+           DateTime? maxOrderDate = null)
         {
-            var query = orders.AsQueryable();
-
-            if (minOrderDate.HasValue)
+            try
             {
-                query = query.Where(o => o.OrderDate >= minOrderDate.Value);
-            }
+                pageNumber = pageNumber ?? 1;
+                pageSize = pageSize ?? DEFAULT_PAGE_SIZE;
 
-            if (maxOrderDate.HasValue)
+                if (pageNumber < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page number must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page number"));
+
+                if (pageSize < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page size must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page size"));
+
+                // Get filtered data with total count
+                var (filteredOrders, totalCount) = await _unitOfWork.OrderRepository.GetOrdersByUserIdAsync(
+                    userId,
+                    pageNumber.Value,
+                    pageSize.Value,
+                    minFreight,
+                    maxFreight,
+                    minOrderDate,
+                    maxOrderDate);
+
+                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(filteredOrders);
+                return PagedApiResponse<OrderDto>.SuccessPagedResponse(
+                    orderDtos,
+                    pageNumber.Value,
+                    pageSize.Value,
+                    totalCount,
+                    "Orders retrieved successfully"
+                );
+            }
+            catch (Exception ex)
             {
-                query = query.Where(o => o.OrderDate <= maxOrderDate.Value);
+                return new PagedApiResponse<OrderDto>
+                {
+                    Success = false,
+                    Message = "Failed to retrieve orders",
+                    Errors = new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                };
             }
-
-            if (minFreight.HasValue)
-            {
-                query = query.Where(o => o.Freight >= minFreight.Value);
-            }
-
-            if (maxFreight.HasValue)
-            {
-                query = query.Where(o => o.Freight <= maxFreight.Value);
-            }
-
-            return query.ToList();
         }
 
-        private (int pageNumber, int pageSize, IEnumerable<Order> orders) ApplyPagination(
-            IEnumerable<Order> orders,
-            int? pageNumber,
-            int? pageSize)
+        private async Task<List<OrderDto>> GetSalesDataAsync(DateTime startDate, DateTime endDate)
         {
-            var actualPageNumber = pageNumber ?? 1;
-            var actualPageSize = pageSize ?? orders.Count();
-
-            var pagedOrders = orders
-                .Skip((actualPageNumber - 1) * actualPageSize)
-                .Take(actualPageSize)
-                .ToList();
-
-            return (actualPageNumber, actualPageSize, pagedOrders);
-        }
-
-        private PagedApiResponse<OrderDto> InvalidPageResponse(string message)
-        {
-            return new PagedApiResponse<OrderDto>
-            {
-                Success = false,
-                Message = message,
-                Errors = new ErrorResponse("VALIDATION_ERROR", message)
-            };
+            var orders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
+            var filteredOrders = orders
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .Select(o => new OrderDto
+                {
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate,
+                    Freight = o.Freight,
+                    MemberId = o.MemberId,
+                    RequiredDate = o.RequiredDate,
+                    ShippedDate = o.ShippedDate
+                })
+                .ToList(); 
+            return filteredOrders;
         }
 
     }

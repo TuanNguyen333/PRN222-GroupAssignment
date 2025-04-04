@@ -1,74 +1,114 @@
-﻿@page "/categories/delete/{CategoryId:int}"
-@rendermode InteractiveServer
+﻿@page "/categories/delete/{Id:int}"
 @using eStore.Models
 @using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Logging
+@rendermode InteractiveServer
 @inject ICategoryService CategoryService
 @inject NavigationManager NavigationManager
+@inject ILogger<Delete> Logger
 
 <PageTitle>Delete Category</PageTitle>
 
-<h1>Delete</h1>
-
-@if (errorMessage != null)
-{
-    <div class="alert alert-danger" role="alert">
-        @errorMessage
-    </div>
-}
-
-@if (isLoading)
-{
-    <p><em>Loading...</em></p>
-}
-else if (category is null)
-{
-    <p>Category not found.</p>
-    <a href="/categories" class="btn btn-secondary">Back to List</a>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        <p>Are you sure you want to delete this category?</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-trash me-2"></i>Delete Category</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/categories">Categories</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Delete</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="/categories" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
     </div>
 
-    <div>
-        <h2>Category</h2>
-        <hr />
-        <dl class="row">
-            <dt class="col-sm-2">Category Name</dt>
-            <dd class="col-sm-10">@category.CategoryName</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">Description</dt>
-            <dd class="col-sm-10">@category.Description</dd>
-        </dl>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = string.Empty"></button>
+        </div>
+    }
 
-        <EditForm method="post" Model="category" OnValidSubmit="DeleteCategory" FormName="delete">
-            <input type="hidden" name="CategoryId" value="@CategoryId" />
-            <button type="submit" class="btn btn-danger" disabled="@isDeleting">
-                @if (isDeleting)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span> Deleting...</span>
-                }
-                else
-                {
-                    <span>Delete</span>
-                }
-            </button>
-            <a href="/categories" class="btn btn-secondary ms-2">Back to List</a>
-        </EditForm>
-    </div>
-}
+    @if (isLoading)
+    {
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading category data...</p>
+        </div>
+    }
+    else if (category == null)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Category not found. The category may have been deleted.
+        </div>
+        <div class="mt-3">
+            <a href="/categories" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Categories
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Confirm Deletion</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Are you sure you want to delete this category? This action cannot be undone.
+                </div>
+
+                <dl class="row mt-4">
+                    <dt class="col-sm-3">Category ID</dt>
+                    <dd class="col-sm-9">@category.CategoryId</dd>
+
+                    <dt class="col-sm-3">Category Name</dt>
+                    <dd class="col-sm-9">@category.CategoryName</dd>
+
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@category.Description</dd>
+                </dl>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="/categories" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete" disabled="@isDeleting">
+                        @if (isDeleting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            <span>Deleting...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-trash"></i>
+                            <span>Delete Category</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter]
-    public int CategoryId { get; set; }
+    public int Id { get; set; }
 
     private Category? category;
+    private string errorMessage = string.Empty;
     private bool isLoading = true;
     private bool isDeleting = false;
-    private string? errorMessage = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,18 +120,28 @@ else
         try
         {
             isLoading = true;
-            errorMessage = null;
+            errorMessage = string.Empty;
 
-            category = await CategoryService.GetCategoryByIdAsync(CategoryId);
-
-            if (category is null)
+            var response = await CategoryService.GetCategoryByIdAsync(Id);
+            
+            if (response.Success && response.Data != null)
             {
-                NavigationManager.NavigateTo("notfound");
+                category = response.Data;
+                Logger.LogInformation("Category loaded successfully: {CategoryId} - {CategoryName}", 
+                    category.CategoryId, category.CategoryName);
+            }
+            else
+            {
+                errorMessage = response.Message ?? $"Category with ID {Id} not found";
+                Logger.LogWarning("Failed to load category: {ErrorMessage}", errorMessage);
+                category = null;
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error loading category: {ex.Message}";
+            errorMessage = "An error occurred while loading the category";
+            Logger.LogError(ex, "Error loading category: {ErrorMessage}", ex.Message);
+            category = null;
         }
         finally
         {
@@ -99,27 +149,38 @@ else
         }
     }
 
-    private async Task DeleteCategory()
+    private async Task ConfirmDelete()
     {
+        if (category == null) return;
+
         try
         {
             isDeleting = true;
-            errorMessage = null;
-
-            bool result = await CategoryService.DeleteCategoryAsync(CategoryId);
-
-            if (result)
+            
+            Logger.LogInformation("Deleting category: {CategoryId} - {CategoryName}", 
+                category.CategoryId, category.CategoryName);
+            
+            var response = await CategoryService.DeleteCategoryAsync(Id);
+            
+            if (response.Success)
             {
+                Logger.LogInformation("Category deleted successfully: {CategoryId}", Id);
                 NavigationManager.NavigateTo("/categories");
             }
             else
             {
-                errorMessage = "Failed to delete category. It may have been removed or you don't have permission.";
+                errorMessage = response.Message ?? "Failed to delete category";
+                if (response.Errors != null && response.Errors.Any())
+                {
+                    errorMessage += $": {string.Join(", ", response.Errors)}";
+                }
+                Logger.LogWarning("Failed to delete category: {ErrorMessage}", errorMessage);
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"An error occurred: {ex.Message}";
+            errorMessage = "An error occurred while deleting the category";
+            Logger.LogError(ex, "Error deleting category: {ErrorMessage}", ex.Message);
         }
         finally
         {

@@ -19,5 +19,15 @@ namespace Services.Interface
            decimal? maxFreight = null,
            DateTime? minOrderDate = null,
            DateTime? maxOrderDate = null);
+
+        Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate);
+        Task<PagedApiResponse<OrderDto>> GetOrdersByUserIdAsync(
+            int userId,
+            int? pageNumber = null,
+            int? pageSize = null,
+            decimal? minFreight = null,
+            decimal? maxFreight = null,
+            DateTime? minOrderDate = null,
+            DateTime? maxOrderDate = null);
     }
 }
