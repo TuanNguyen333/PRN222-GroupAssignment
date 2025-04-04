@@ -666,3 +666,423 @@ WHERE [m].[MemberId] = @__p_0
 2025-04-04 17:09:21.980 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetCurrentUser (API)'
 2025-04-04 17:09:21.991 +07:00 [INF] HTTP GET /api/members/user responded 200 in 180.2287 ms
 2025-04-04 17:09:22.008 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/user - 200 null application/json; charset=utf-8 235.287ms
+2025-04-04 18:26:03.631 +07:00 [INF] User profile is available. Using 'C:\Users\HIEU\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-04-04 18:26:04.200 +07:00 [INF] Now listening on: https://localhost:7173
+2025-04-04 18:26:04.211 +07:00 [INF] Now listening on: http://localhost:5096
+2025-04-04 18:26:04.358 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-04-04 18:26:04.375 +07:00 [INF] Hosting environment: Development
+2025-04-04 18:26:04.385 +07:00 [INF] Content root path: D:\Ass03Solution\API
+2025-04-04 18:29:47.561 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:29:48.910 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:29:48.940 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:29:50.760 +07:00 [WRN] Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+2025-04-04 18:29:51.446 +07:00 [WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-04-04 18:29:51.455 +07:00 [WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-04-04 18:29:53.019 +07:00 [INF] Executed DbCommand (154ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:29:53.087 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:29:53.109 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 4151.7499ms
+2025-04-04 18:29:53.121 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:29:53.130 +07:00 [INF] HTTP GET /api/categories responded 200 in 5537.7942 ms
+2025-04-04 18:29:53.155 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 5594.2116ms
+2025-04-04 18:29:53.666 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:29:53.679 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:29:53.684 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:29:53.778 +07:00 [INF] Executed DbCommand (38ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:29:53.791 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:29:53.795 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 101.6503ms
+2025-04-04 18:29:53.798 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:29:53.801 +07:00 [INF] HTTP GET /api/categories responded 200 in 123.8176 ms
+2025-04-04 18:29:53.806 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 140.7938ms
+2025-04-04 18:30:02.902 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:30:02.915 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:02.919 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:02.977 +07:00 [INF] Executed DbCommand (37ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:30:03.008 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:03.023 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 97.7352ms
+2025-04-04 18:30:03.029 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:03.036 +07:00 [INF] HTTP GET /api/categories responded 200 in 123.1605 ms
+2025-04-04 18:30:03.046 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 143.315ms
+2025-04-04 18:30:03.636 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:30:03.654 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:03.659 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:03.702 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:30:03.718 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:03.724 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 59.8914ms
+2025-04-04 18:30:03.732 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:03.736 +07:00 [INF] HTTP GET /api/categories responded 200 in 82.0524 ms
+2025-04-04 18:30:03.741 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 106.0599ms
+2025-04-04 18:30:09.427 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories/0 - null null
+2025-04-04 18:30:09.442 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetById (API)'
+2025-04-04 18:30:09.450 +07:00 [INF] Route matched with {action = "GetById", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:09.617 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+WHERE [c].[CategoryId] = @__p_0
+2025-04-04 18:30:09.683 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:09.701 +07:00 [INF] Executed action API.Controllers.CategoryController.GetById (API) in 242.1548ms
+2025-04-04 18:30:09.710 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetById (API)'
+2025-04-04 18:30:09.716 +07:00 [INF] HTTP GET /api/categories/0 responded 200 in 274.8440 ms
+2025-04-04 18:30:09.721 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories/0 - 200 null application/json; charset=utf-8 294.0535ms
+2025-04-04 18:30:09.796 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories/0 - null null
+2025-04-04 18:30:09.824 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetById (API)'
+2025-04-04 18:30:09.835 +07:00 [INF] Route matched with {action = "GetById", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:09.899 +07:00 [INF] Executed DbCommand (37ms) [Parameters=[@__p_0='0'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+WHERE [c].[CategoryId] = @__p_0
+2025-04-04 18:30:09.927 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:09.945 +07:00 [INF] Executed action API.Controllers.CategoryController.GetById (API) in 99.8668ms
+2025-04-04 18:30:09.963 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetById (API)'
+2025-04-04 18:30:09.968 +07:00 [INF] HTTP GET /api/categories/0 responded 200 in 144.1729 ms
+2025-04-04 18:30:09.971 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories/0 - 200 null application/json; charset=utf-8 175.3782ms
+2025-04-04 18:30:12.352 +07:00 [INF] Request starting HTTP/1.1 DELETE https://localhost:7173/api/categories/0 - null null
+2025-04-04 18:30:12.365 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.Delete (API)'
+2025-04-04 18:30:12.370 +07:00 [INF] Route matched with {action = "Delete", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Delete(Int32) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:12.415 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+WHERE [c].[CategoryId] = @__p_0
+2025-04-04 18:30:12.668 +07:00 [INF] Executed DbCommand (37ms) [Parameters=[@p0='0'], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+DELETE FROM [Categories]
+OUTPUT 1
+WHERE [CategoryId] = @p0;
+2025-04-04 18:30:12.814 +07:00 [ERR] An exception occurred in the database while saving changes for context type 'BusinessObjects.Entities.eStoreDBContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Microsoft.Data.SqlClient.SqlException (0x80131904): The DELETE statement conflicted with the REFERENCE constraint "FK__Products__Catego__6754599E". The conflict occurred in database "eStoreDB", table "dbo.Products", column 'CategoryId'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryHasMoreRows(Boolean& moreRows)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryReadInternal(Boolean setTimeout, Boolean& more)
+   at Microsoft.Data.SqlClient.SqlDataReader.ReadAsyncExecute(Task task, Object state)
+   at Microsoft.Data.SqlClient.SqlDataReader.InvokeAsyncCall[T](SqlDataReaderBaseAsyncCallContext`1 context)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeResultSetWithRowsAffectedOnlyAsync(Int32 commandIndex, RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+ClientConnectionId:e433b341-47ec-48ad-96d2-2e1e6c8bbd4e
+Error Number:547,State:0,Class:16
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Microsoft.Data.SqlClient.SqlException (0x80131904): The DELETE statement conflicted with the REFERENCE constraint "FK__Products__Catego__6754599E". The conflict occurred in database "eStoreDB", table "dbo.Products", column 'CategoryId'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryHasMoreRows(Boolean& moreRows)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryReadInternal(Boolean setTimeout, Boolean& more)
+   at Microsoft.Data.SqlClient.SqlDataReader.ReadAsyncExecute(Task task, Object state)
+   at Microsoft.Data.SqlClient.SqlDataReader.InvokeAsyncCall[T](SqlDataReaderBaseAsyncCallContext`1 context)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeResultSetWithRowsAffectedOnlyAsync(Int32 commandIndex, RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+ClientConnectionId:e433b341-47ec-48ad-96d2-2e1e6c8bbd4e
+Error Number:547,State:0,Class:16
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+2025-04-04 18:30:26.940 +07:00 [INF] Executed action API.Controllers.CategoryController.Delete (API) in 14564.1043ms
+2025-04-04 18:30:26.945 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.Delete (API)'
+2025-04-04 18:30:26.950 +07:00 [ERR] HTTP DELETE /api/categories/0 responded 500 in 14584.6669 ms
+System.InvalidOperationException: No transaction in progress.
+   at Repositories.Implementation.UnitOfWork.RollbackTransactionAsync() in D:\Ass03Solution\Repositories\Implementation\UnitOfWork.cs:line 71
+   at Services.Implementation.CategoryService.DeleteAsync(Int32 id) in D:\Ass03Solution\Services\Implementation\CategoryService.cs:line 211
+   at API.Controllers.CategoryController.Delete(Int32 id) in D:\Ass03Solution\API\Controllers\CategoryController.cs:line 94
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2025-04-04 18:30:27.010 +07:00 [ERR] An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: No transaction in progress.
+   at Repositories.Implementation.UnitOfWork.RollbackTransactionAsync() in D:\Ass03Solution\Repositories\Implementation\UnitOfWork.cs:line 71
+   at Services.Implementation.CategoryService.DeleteAsync(Int32 id) in D:\Ass03Solution\Services\Implementation\CategoryService.cs:line 211
+   at API.Controllers.CategoryController.Delete(Int32 id) in D:\Ass03Solution\API\Controllers\CategoryController.cs:line 94
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2025-04-04 18:30:27.027 +07:00 [INF] Request finished HTTP/1.1 DELETE https://localhost:7173/api/categories/0 - 500 null text/plain; charset=utf-8 14674.8034ms
+2025-04-04 18:30:38.360 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:30:38.379 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:38.381 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:38.486 +07:00 [INF] Executed DbCommand (95ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:30:38.496 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:38.506 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 117.2164ms
+2025-04-04 18:30:38.513 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:38.517 +07:00 [INF] HTTP GET /api/categories responded 200 in 138.6289 ms
+2025-04-04 18:30:38.529 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 168.5955ms
+2025-04-04 18:30:38.640 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:30:38.652 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:38.658 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:30:38.724 +07:00 [INF] Executed DbCommand (48ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:30:38.738 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:30:38.748 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 74.3336ms
+2025-04-04 18:30:38.756 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:30:38.764 +07:00 [INF] HTTP GET /api/categories responded 200 in 112.2207 ms
+2025-04-04 18:30:38.769 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 129.2387ms
+2025-04-04 18:30:49.947 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:30:49.975 +07:00 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Member)
+2025-04-04 18:30:49.994 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2025-04-04 18:30:50.005 +07:00 [INF] HTTP GET /api/orders/user responded 401 in 37.8092 ms
+2025-04-04 18:30:50.014 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - 401 0 null 66.3862ms
+2025-04-04 18:30:50.200 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:30:50.218 +07:00 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Member)
+2025-04-04 18:30:50.221 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2025-04-04 18:30:50.226 +07:00 [INF] HTTP GET /api/orders/user responded 401 in 9.0298 ms
+2025-04-04 18:30:50.234 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - 401 0 null 34.6476ms
+2025-04-04 18:30:59.468 +07:00 [INF] Request starting HTTP/1.1 POST https://localhost:7173/api/auth/login - application/json; charset=utf-8 null
+2025-04-04 18:30:59.485 +07:00 [INF] Executing endpoint 'API.Controllers.AuthController.Login (API)'
+2025-04-04 18:30:59.491 +07:00 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(BusinessObjects.Dto.Auth.LoginDto) on controller API.Controllers.AuthController (API).
+2025-04-04 18:30:59.658 +07:00 [INF] Executed DbCommand (39ms) [Parameters=[@__email_0='john.doe@example.com' (Size = 100) (DbType = AnsiString)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[Email] = @__email_0
+2025-04-04 18:31:00.790 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Auth.AuthenticationResponse, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:00.801 +07:00 [INF] Executed action API.Controllers.AuthController.Login (API) in 1305.6387ms
+2025-04-04 18:31:00.810 +07:00 [INF] Executed endpoint 'API.Controllers.AuthController.Login (API)'
+2025-04-04 18:31:00.814 +07:00 [INF] HTTP POST /api/auth/login responded 200 in 1329.1135 ms
+2025-04-04 18:31:00.822 +07:00 [INF] Request finished HTTP/1.1 POST https://localhost:7173/api/auth/login - 200 null application/json; charset=utf-8 1353.8911ms
+2025-04-04 18:31:19.362 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:31:19.574 +07:00 [INF] Executing endpoint 'API.Controllers.OrderController.GetAll (API)'
+2025-04-04 18:31:19.585 +07:00 [INF] Route matched with {action = "GetAll", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Decimal], System.Nullable`1[System.Decimal]) on controller API.Controllers.OrderController (API).
+2025-04-04 18:31:19.652 +07:00 [WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-04-04 18:31:19.662 +07:00 [WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+2025-04-04 18:31:19.719 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0', @__p_1='10'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:31:19.794 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:31:19.805 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Order.OrderDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:19.863 +07:00 [INF] Executed action API.Controllers.OrderController.GetAll (API) in 261.2517ms
+2025-04-04 18:31:19.873 +07:00 [INF] Executed endpoint 'API.Controllers.OrderController.GetAll (API)'
+2025-04-04 18:31:19.881 +07:00 [INF] HTTP GET /api/orders responded 200 in 490.7597 ms
+2025-04-04 18:31:19.886 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders?pageNumber=1&pageSize=10 - 200 null application/json; charset=utf-8 524.9012ms
+2025-04-04 18:31:19.934 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/2 - null null
+2025-04-04 18:31:19.996 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.013 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:20.040 +07:00 [INF] Getting member with ID: 2
+2025-04-04 18:31:20.098 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='2'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:20.118 +07:00 [INF] Successfully retrieved member with ID: 2
+2025-04-04 18:31:20.123 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:20.133 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 99.9467ms
+2025-04-04 18:31:20.141 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.148 +07:00 [INF] HTTP GET /api/members/2 responded 200 in 191.7873 ms
+2025-04-04 18:31:20.156 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/2 - 200 null application/json; charset=utf-8 222.0024ms
+2025-04-04 18:31:20.173 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/3 - null null
+2025-04-04 18:31:20.218 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.226 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:20.233 +07:00 [INF] Getting member with ID: 3
+2025-04-04 18:31:20.272 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='3'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:20.295 +07:00 [INF] Successfully retrieved member with ID: 3
+2025-04-04 18:31:20.304 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:20.319 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 88.6606ms
+2025-04-04 18:31:20.331 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.342 +07:00 [INF] HTTP GET /api/members/3 responded 200 in 162.1941 ms
+2025-04-04 18:31:20.355 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/3 - 200 null application/json; charset=utf-8 182.3032ms
+2025-04-04 18:31:20.376 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/1 - null null
+2025-04-04 18:31:20.430 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.438 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:20.452 +07:00 [INF] Getting member with ID: 1
+2025-04-04 18:31:20.497 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:20.513 +07:00 [INF] Successfully retrieved member with ID: 1
+2025-04-04 18:31:20.519 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:20.527 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 76.0558ms
+2025-04-04 18:31:20.535 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:20.541 +07:00 [INF] HTTP GET /api/members/1 responded 200 in 149.0771 ms
+2025-04-04 18:31:20.553 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/1 - 200 null application/json; charset=utf-8 177.4207ms
+2025-04-04 18:31:20.781 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:31:20.836 +07:00 [INF] Executing endpoint 'API.Controllers.OrderController.GetAll (API)'
+2025-04-04 18:31:20.847 +07:00 [INF] Route matched with {action = "GetAll", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], System.Nullable`1[System.Decimal], System.Nullable`1[System.Decimal]) on controller API.Controllers.OrderController (API).
+2025-04-04 18:31:20.894 +07:00 [INF] Executed DbCommand (39ms) [Parameters=[@__p_0='0', @__p_1='10'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:31:20.951 +07:00 [INF] Executed DbCommand (47ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:31:20.961 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Order.OrderDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:20.966 +07:00 [INF] Executed action API.Controllers.OrderController.GetAll (API) in 112.9108ms
+2025-04-04 18:31:20.970 +07:00 [INF] Executed endpoint 'API.Controllers.OrderController.GetAll (API)'
+2025-04-04 18:31:20.975 +07:00 [INF] HTTP GET /api/orders responded 200 in 176.3804 ms
+2025-04-04 18:31:20.982 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders?pageNumber=1&pageSize=10 - 200 null application/json; charset=utf-8 200.8934ms
+2025-04-04 18:31:20.997 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/2 - null null
+2025-04-04 18:31:21.067 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.075 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:21.084 +07:00 [INF] Getting member with ID: 2
+2025-04-04 18:31:21.127 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='2'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:21.134 +07:00 [INF] Successfully retrieved member with ID: 2
+2025-04-04 18:31:21.137 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:21.143 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 59.8401ms
+2025-04-04 18:31:21.151 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.200 +07:00 [INF] HTTP GET /api/members/2 responded 200 in 170.1689 ms
+2025-04-04 18:31:21.207 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/2 - 200 null application/json; charset=utf-8 210.1298ms
+2025-04-04 18:31:21.223 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/3 - null null
+2025-04-04 18:31:21.275 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.280 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:21.287 +07:00 [INF] Getting member with ID: 3
+2025-04-04 18:31:21.331 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='3'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:21.341 +07:00 [INF] Successfully retrieved member with ID: 3
+2025-04-04 18:31:21.345 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:21.350 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 63.7308ms
+2025-04-04 18:31:21.355 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.361 +07:00 [INF] HTTP GET /api/members/3 responded 200 in 122.9643 ms
+2025-04-04 18:31:21.368 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/3 - 200 null application/json; charset=utf-8 144.9611ms
+2025-04-04 18:31:21.388 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/members/1 - null null
+2025-04-04 18:31:21.437 +07:00 [INF] Executing endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.445 +07:00 [INF] Route matched with {action = "GetById", controller = "Member"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetById(Int32) on controller API.Controllers.MemberController (API).
+2025-04-04 18:31:21.453 +07:00 [INF] Getting member with ID: 1
+2025-04-04 18:31:21.498 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [m].[MemberId], [m].[City], [m].[CompanyName], [m].[Country], [m].[Email], [m].[Password]
+FROM [Member] AS [m]
+WHERE [m].[MemberId] = @__p_0
+2025-04-04 18:31:21.513 +07:00 [INF] Successfully retrieved member with ID: 1
+2025-04-04 18:31:21.519 +07:00 [INF] Executing OkObjectResult, writing value of type 'BusinessObjects.Base.ApiResponse`1[[BusinessObjects.Dto.Member.MemberDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:31:21.527 +07:00 [INF] Executed action API.Controllers.MemberController.GetById (API) in 74.6792ms
+2025-04-04 18:31:21.534 +07:00 [INF] Executed endpoint 'API.Controllers.MemberController.GetById (API)'
+2025-04-04 18:31:21.541 +07:00 [INF] HTTP GET /api/members/1 responded 200 in 141.1425 ms
+2025-04-04 18:31:21.551 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/members/1 - 200 null application/json; charset=utf-8 163.3895ms
+2025-04-04 18:31:59.723 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:31:59.792 +07:00 [INF] Executing endpoint 'API.Controllers.OrderController.GetOrdersByUser (API)'
+2025-04-04 18:31:59.808 +07:00 [INF] Route matched with {action = "GetOrdersByUser", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetOrdersByUser(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.Nullable`1[System.Decimal], System.Nullable`1[System.Decimal], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime]) on controller API.Controllers.OrderController (API).
+2025-04-04 18:32:00.252 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__userId_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM [Order] AS [o]
+WHERE [o].[MemberId] = @__userId_0
+2025-04-04 18:32:00.322 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__userId_0='1', @__p_1='0', @__p_2='10'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+WHERE [o].[MemberId] = @__userId_0
+ORDER BY [o].[OrderDate] DESC
+OFFSET @__p_1 ROWS FETCH NEXT @__p_2 ROWS ONLY
+2025-04-04 18:32:00.348 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Order.OrderDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:32:00.356 +07:00 [INF] Executed action API.Controllers.OrderController.GetOrdersByUser (API) in 536.4808ms
+2025-04-04 18:32:00.362 +07:00 [INF] Executed endpoint 'API.Controllers.OrderController.GetOrdersByUser (API)'
+2025-04-04 18:32:00.369 +07:00 [INF] HTTP GET /api/orders/user responded 200 in 633.6789 ms
+2025-04-04 18:32:00.375 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - 200 null application/json; charset=utf-8 652.0978ms
+2025-04-04 18:32:00.478 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - null null
+2025-04-04 18:32:00.525 +07:00 [INF] Executing endpoint 'API.Controllers.OrderController.GetOrdersByUser (API)'
+2025-04-04 18:32:00.530 +07:00 [INF] Route matched with {action = "GetOrdersByUser", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetOrdersByUser(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.Nullable`1[System.Decimal], System.Nullable`1[System.Decimal], System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime]) on controller API.Controllers.OrderController (API).
+2025-04-04 18:32:00.573 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__userId_0='1'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM [Order] AS [o]
+WHERE [o].[MemberId] = @__userId_0
+2025-04-04 18:32:00.646 +07:00 [INF] Executed DbCommand (37ms) [Parameters=[@__userId_0='1', @__p_1='0', @__p_2='10'], CommandType='"Text"', CommandTimeout='30']
+SELECT [o].[OrderId], [o].[Freight], [o].[MemberId], [o].[OrderDate], [o].[RequiredDate], [o].[ShippedDate]
+FROM [Order] AS [o]
+WHERE [o].[MemberId] = @__userId_0
+ORDER BY [o].[OrderDate] DESC
+OFFSET @__p_1 ROWS FETCH NEXT @__p_2 ROWS ONLY
+2025-04-04 18:32:00.654 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Order.OrderDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:32:00.661 +07:00 [INF] Executed action API.Controllers.OrderController.GetOrdersByUser (API) in 125.8437ms
+2025-04-04 18:32:00.666 +07:00 [INF] Executed endpoint 'API.Controllers.OrderController.GetOrdersByUser (API)'
+2025-04-04 18:32:00.670 +07:00 [INF] HTTP GET /api/orders/user responded 200 in 181.6533 ms
+2025-04-04 18:32:00.678 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/orders/user?pageNumber=1&pageSize=10 - 200 null application/json; charset=utf-8 199.513ms
+2025-04-04 18:34:38.090 +07:00 [INF] Request starting HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - null null
+2025-04-04 18:34:38.103 +07:00 [INF] Executing endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:34:38.105 +07:00 [INF] Route matched with {action = "GetAll", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.String) on controller API.Controllers.CategoryController (API).
+2025-04-04 18:34:38.149 +07:00 [INF] Executed DbCommand (36ms) [Parameters=[@__p_0='0', @__p_1='2147483647'], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CategoryId], [c].[CategoryName], [c].[Description]
+FROM [Categories] AS [c]
+ORDER BY (SELECT 1)
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2025-04-04 18:34:38.168 +07:00 [INF] Executing OkObjectResult, writing value of type 'PagedApiResponse`1[[BusinessObjects.Dto.Category.CategoryDto, BusinessObjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2025-04-04 18:34:38.171 +07:00 [INF] Executed action API.Controllers.CategoryController.GetAll (API) in 60.3224ms
+2025-04-04 18:34:38.176 +07:00 [INF] Executed endpoint 'API.Controllers.CategoryController.GetAll (API)'
+2025-04-04 18:34:38.179 +07:00 [INF] HTTP GET /api/categories responded 200 in 76.4671 ms
+2025-04-04 18:34:38.196 +07:00 [INF] Request finished HTTP/1.1 GET https://localhost:7173/api/categories?pageNumber=1&pageSize=5 - 200 null application/json; charset=utf-8 105.7087ms
