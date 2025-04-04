@@ -253,52 +253,6 @@ namespace Services.Implementation
             }
         }
 
-        private async Task<IEnumerable<Order>> GetAllOrdersWithPaginationFallback()
-        {
-            try
-            {
-                pageNumber = pageNumber ?? 1;
-                pageSize = pageSize ?? DEFAULT_PAGE_SIZE;
-
-                if (pageNumber < 1)
-                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page number must be greater than 0",
-                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page number"));
-
-                if (pageSize < 1)
-                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page size must be greater than 0",
-                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page size"));
-
-                // Get filtered data with total count
-                var (filteredOrders, totalCount) = await _unitOfWork.OrderRepository.GetOrdersByUserIdAsync(
-                    userId,
-                    pageNumber.Value,
-                    pageSize.Value,
-                    minFreight,
-                    maxFreight,
-                    minOrderDate,
-                    maxOrderDate);
-
-                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(filteredOrders);
-                return PagedApiResponse<OrderDto>.SuccessPagedResponse(
-                    orderDtos,
-                    pageNumber.Value,
-                    pageSize.Value,
-                    totalCount,
-                    "Orders retrieved successfully"
-                );
-            }
-            catch (Exception ex)
-            {
-                return new PagedApiResponse<OrderDto>
-                {
-                    Success = false,
-                    Message = "Failed to retrieve orders",
-                    Errors = new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
-                };
-            }
-        }
-        
-        
         public async Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate)
         {
             // Set the license context
@@ -344,6 +298,59 @@ namespace Services.Implementation
 
             return stream;
         }
+
+       public async Task<PagedApiResponse<OrderDto>> GetOrdersByUserIdAsync(
+           int userId,
+           int? pageNumber = null,
+           int? pageSize = null,
+           decimal? minFreight = null,
+           decimal? maxFreight = null,
+           DateTime? minOrderDate = null,
+           DateTime? maxOrderDate = null)
+        {
+            try
+            {
+                pageNumber = pageNumber ?? 1;
+                pageSize = pageSize ?? DEFAULT_PAGE_SIZE;
+
+                if (pageNumber < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page number must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page number"));
+
+                if (pageSize < 1)
+                    return (PagedApiResponse<OrderDto>)PagedApiResponse<OrderDto>.ErrorResponse("Page size must be greater than 0",
+                        new BusinessObjects.Base.ErrorResponse("VALIDATION_ERROR", "Invalid page size"));
+
+                // Get filtered data with total count
+                var (filteredOrders, totalCount) = await _unitOfWork.OrderRepository.GetOrdersByUserIdAsync(
+                    userId,
+                    pageNumber.Value,
+                    pageSize.Value,
+                    minFreight,
+                    maxFreight,
+                    minOrderDate,
+                    maxOrderDate);
+
+                var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(filteredOrders);
+                return PagedApiResponse<OrderDto>.SuccessPagedResponse(
+                    orderDtos,
+                    pageNumber.Value,
+                    pageSize.Value,
+                    totalCount,
+                    "Orders retrieved successfully"
+                );
+            }
+            catch (Exception ex)
+            {
+                return new PagedApiResponse<OrderDto>
+                {
+                    Success = false,
+                    Message = "Failed to retrieve orders",
+                    Errors = new BusinessObjects.Base.ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                };
+            }
+        }
+
         private async Task<List<OrderDto>> GetSalesDataAsync(DateTime startDate, DateTime endDate)
         {
             var orders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
