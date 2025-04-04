@@ -321,7 +321,7 @@
                 if (!categoryNames.ContainsKey(product.CategoryId))
                 {
                     var category = await CategoryService.GetCategoryByIdAsync(product.CategoryId);
-                    categoryNames[product.CategoryId] = category?.CategoryName ?? $"Category {product.CategoryId}";
+                    categoryNames[product.CategoryId] = category?.Data?.CategoryName ?? $"Category {product.CategoryId}";
                 }
             }
             Logger.LogInformation("Successfully loaded category names");

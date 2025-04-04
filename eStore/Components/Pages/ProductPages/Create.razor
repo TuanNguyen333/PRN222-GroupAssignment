@@ -117,12 +117,22 @@
     {
         try
         {
-            categories = await CategoryService.GetAllCategoriesAsync();
-            if (!categories.Any())
+            var response = await CategoryService.GetAllCategoriesAsync();
+            if (response.Success && response.Data != null)
             {
-                message = "Unable to load categories. Please try again later.";
+                categories = response.Data.Items.ToList();
+                if (!categories.Any())
+                {
+                    message = "Unable to load categories. Please try again later.";
+                    messageClass = "alert-warning";
+                    Logger.LogWarning("No categories found");
+                }
+            }
+            else
+            {
+                message = "Failed to load categories. Please try again later.";
                 messageClass = "alert-warning";
-                Logger.LogWarning("No categories found");
+                Logger.LogWarning("Failed to load categories: {Message}", response.Message);
             }
         }
         catch (HttpRequestException ex)
