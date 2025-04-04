@@ -1,0 +1,113 @@
+﻿using API.Controllers;
+using BusinessObjects.Dto.Product;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using Services.Interface;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using BusinessObjects.Base;
+using Microsoft.AspNetCore.Http;
+using Xunit;
+
+public class ProductControllerTests
+{
+    private readonly Mock<IProductService> _mockProductService;
+    private readonly ProductController _controller;
+
+    public ProductControllerTests()
+    {
+        _mockProductService = new Mock<IProductService>();
+        _controller = new ProductController(_mockProductService.Object);
+    }
+
+    [Fact]
+    public async Task GetAll_ReturnsOkResult_WhenSuccess()
+    {
+        // Arrange
+        var pagedResponse = new PagedResponse<ProductDto>(new List<ProductDto>(), 1, 10, 0);
+        var response = new PagedApiResponse<ProductDto> { Success = true, Data = pagedResponse };
+        _mockProductService.Setup(service => service.GetAllAsync(It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<decimal?>(), It.IsAny<decimal?>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.GetAll();
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsOkResult_WhenProductExists()
+    {
+        // Arrange
+        var response = new ApiResponse<ProductDto> { Success = true, Data = new ProductDto { ProductId = 1 } };
+        _mockProductService.Setup(service => service.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.GetById(1);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsNotFound_WhenProductDoesNotExist()
+    {
+        // Arrange
+        var response = new ApiResponse<ProductDto> { Success = false };
+        _mockProductService.Setup(service => service.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.GetById(1);
+
+        // Assert
+        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+        Assert.Equal(404, notFoundResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsCreatedAtAction_WhenSuccess()
+    {
+        // Arrange
+        var response = new ApiResponse<ProductDto> { Success = true, Data = new ProductDto { ProductId = 1 } };
+        _mockProductService.Setup(service => service.CreateAsync(It.IsAny<ProductForCreationDto>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.Create(new ProductForCreationDto());
+
+        // Assert
+        var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+        Assert.Equal(201, createdAtActionResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsOkResult_WhenSuccess()
+    {
+        // Arrange
+        var response = new ApiResponse<ProductDto> { Success = true };
+        _mockProductService.Setup(service => service.UpdateAsync(It.IsAny<int>(), It.IsAny<ProductForUpdateDto>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.Update(1, new ProductForUpdateDto());
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(200, okResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task Delete_ReturnsNoContent_WhenSuccess()
+    {
+        // Arrange
+        var response = new ApiResponse<string> { Success = true };
+        _mockProductService.Setup(service => service.DeleteAsync(It.IsAny<int>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.Delete(1);
+
+        // Assert
+        var noContentResult = Assert.IsType<NoContentResult>(result);
+        Assert.Equal(204, noContentResult.StatusCode);
+    }
+}

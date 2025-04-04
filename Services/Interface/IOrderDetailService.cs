@@ -2,6 +2,7 @@
 using BusinessObjects.Base;
 using BusinessObjects.Dto.OrderDetail;
 using BusinessObjects.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Services.Interface
 {
@@ -16,11 +17,21 @@ namespace Services.Interface
       int? maxQuantity = null,
       double? minDiscount = null,
       double? maxDiscount = null);
+        Task<IActionResult> ExportOrderDetailsToExcel(
+    int? pageNumber = null,
+    int? pageSize = null,
+    decimal? minUnitPrice = null,
+    decimal? maxUnitPrice = null,
+    int? minQuantity = null,
+    int? maxQuantity = null,
+    double? minDiscount = null,
+    double? maxDiscount = null);
         Task<ApiResponse<OrderDetailForCreationResponseDto>> CreateAsync(OrderDetailForCreationDto orderDetail);
         Task<ApiResponse<OrderDetailDto>> UpdateAsync(int id, OrderDetailForUpdateDto orderDetail);
         Task<ApiResponse<string>> DeleteAsync(int id);
         Task<ApiResponse<OrderDetailDto>> GetByIdAsync(int orderId, int productId);
-        Task<MemoryStream> ExportOrderDetailsToExcelAsync(DateTime startDate, DateTime endDate);
+        //Task<MemoryStream> ExportOrderDetailsToExcelAsync(DateTime startDate, DateTime endDate);
         Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null, int? pageSize = null);
+       
     }
 }

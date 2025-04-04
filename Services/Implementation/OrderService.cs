@@ -253,17 +253,18 @@ namespace Services.Implementation
             }
         }
 
-        public async Task<MemoryStream> ExportSalesToExcelAsync(DateTime startDate, DateTime endDate)
+        public async Task<MemoryStream> ExportAllOrdersToExcelAsync()
         {
-            // Set the license context
+            // Set the license context for EPPlus
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            // Fetch sales data based on date range
-            var salesData = await GetSalesDataAsync(startDate, endDate);
+            // Fetch all orders (you might need to implement this if it doesn't exist yet)
+            var allOrders = (await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue)).ToList();
 
-            // Create Excel file
+
+            // Create Excel package
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("SalesData");
+            var worksheet = package.Workbook.Worksheets.Add("AllOrders");
 
             // Add headers
             worksheet.Cells[1, 1].Value = "Order ID";
@@ -273,25 +274,30 @@ namespace Services.Implementation
             worksheet.Cells[1, 5].Value = "Required Date";
             worksheet.Cells[1, 6].Value = "Shipped Date";
 
-            // Set column widths
+            // Set column widths for better formatting
             worksheet.Column(2).Width = 15; // Order Date
             worksheet.Column(5).Width = 15; // Required Date
             worksheet.Column(6).Width = 15; // Shipped Date
+            for (int i = 0; i < allOrders.Count(); i++)
 
-            // Add data
-            for (int i = 0; i < salesData.Count; i++)
-            {
-                worksheet.Cells[i + 2, 1].Value = salesData[i].OrderId;
-                worksheet.Cells[i + 2, 2].Value = salesData[i].OrderDate;
-                worksheet.Cells[i + 2, 2].Style.Numberformat.Format = "yyyy-mm-dd";
-                worksheet.Cells[i + 2, 3].Value = salesData[i].Freight;
-                worksheet.Cells[i + 2, 4].Value = salesData[i].MemberId;
-                worksheet.Cells[i + 2, 5].Value = salesData[i].RequiredDate;
-                worksheet.Cells[i + 2, 5].Style.Numberformat.Format = "yyyy-mm-dd";
-                worksheet.Cells[i + 2, 6].Value = salesData[i].ShippedDate;
-                worksheet.Cells[i + 2, 6].Style.Numberformat.Format = "yyyy-mm-dd";
-            }
+                // Populate data
+                for (int j = 0; j < allOrders.Count(); j++)
+                {
+                    var order = allOrders[j];
 
+                    worksheet.Cells[j + 2, 1].Value = order.OrderId;
+                    worksheet.Cells[j + 2, 2].Value = order.OrderDate;
+                    worksheet.Cells[j + 2, 2].Style.Numberformat.Format = "yyyy-mm-dd";
+                    worksheet.Cells[j + 2, 3].Value = order.Freight;
+                    worksheet.Cells[j + 2, 4].Value = order.MemberId;
+                    worksheet.Cells[j + 2, 5].Value = order.RequiredDate;
+                    worksheet.Cells[j + 2, 5].Style.Numberformat.Format = "yyyy-mm-dd";
+                    worksheet.Cells[j + 2, 6].Value = order.ShippedDate;
+                    worksheet.Cells[j + 2, 6].Style.Numberformat.Format = "yyyy-mm-dd";
+                }
+
+
+            // Save to stream
             var stream = new MemoryStream();
             package.SaveAs(stream);
             stream.Position = 0;
@@ -351,23 +357,23 @@ namespace Services.Implementation
             }
         }
 
-        private async Task<List<OrderDto>> GetSalesDataAsync(DateTime startDate, DateTime endDate)
-        {
-            var orders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
-            var filteredOrders = orders
-                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
-                .Select(o => new OrderDto
-                {
-                    OrderId = o.OrderId,
-                    OrderDate = o.OrderDate,
-                    Freight = o.Freight,
-                    MemberId = o.MemberId,
-                    RequiredDate = o.RequiredDate,
-                    ShippedDate = o.ShippedDate
-                })
-                .ToList(); 
-            return filteredOrders;
-        }
+        //private async Task<List<OrderDto>> GetSalesDataAsync(DateTime startDate, DateTime endDate)
+        //{
+        //    var orders = await _unitOfWork.OrderRepository.GetAllAsync(1, int.MaxValue);
+        //    var filteredOrders = orders
+        //        .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+        //        .Select(o => new OrderDto
+        //        {
+        //            OrderId = o.OrderId,
+        //            OrderDate = o.OrderDate,
+        //            Freight = o.Freight,
+        //            MemberId = o.MemberId,
+        //            RequiredDate = o.RequiredDate,
+        //            ShippedDate = o.ShippedDate
+        //        })
+        //        .ToList(); 
+        //    return filteredOrders;
+        //}
 
     }
 }

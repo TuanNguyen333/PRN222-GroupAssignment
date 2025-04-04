@@ -100,25 +100,70 @@ namespace API.Controllers
             }
             return NoContent();
         }
-        
+
+        //[HttpGet("export")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> ExportToExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        //{
+        //    try
+        //    {
+        //        var stream = await _orderDetailService.ExportOrderDetailsToExcelAsync(startDate, endDate);
+        //        stream.Position = 0;
+        //        var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        //        var fileName = $"OrderDetails_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+        //        return File(stream, contentType, fileName);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
+        //    }
+        //}
+
+
+
         [HttpGet("export")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ExportToExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<IActionResult> ExportToExcel(
+            [FromQuery] int? pageNumber = null,
+            [FromQuery] int? pageSize = null,
+            [FromQuery] decimal? minUnitPrice = null,
+            [FromQuery] decimal? maxUnitPrice = null,
+            [FromQuery] int? minQuantity = null,
+            [FromQuery] int? maxQuantity = null,
+            [FromQuery] double? minDiscount = null,
+            [FromQuery] double? maxDiscount = null)
         {
-            try
+            var result = await _orderDetailService.ExportOrderDetailsToExcel(
+                pageNumber, pageSize, minUnitPrice, maxUnitPrice, minQuantity, maxQuantity, minDiscount, maxDiscount);
+
+            if (result is FileContentResult fileResult)
             {
-                var stream = await _orderDetailService.ExportOrderDetailsToExcelAsync(startDate, endDate);
-                stream.Position = 0;
-                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                var fileName = $"OrderDetails_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
-                return File(stream, contentType, fileName);
+                return fileResult;
             }
-            catch (Exception ex)
+
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to export order details to Excel" });
+        }
+        
+        
+        [HttpGet("order/{orderId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetByOrderId(
+            int orderId,
+            [FromQuery] int? pageNumber = null,
+            [FromQuery] int? pageSize = null)
+        {
+            var response = await _orderDetailService.GetByOrderIdAsync(orderId, pageNumber, pageSize);
+            if (!response.Success)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
+                return NotFound(response);
             }
+            return Ok(response);
         }
     }
 }
