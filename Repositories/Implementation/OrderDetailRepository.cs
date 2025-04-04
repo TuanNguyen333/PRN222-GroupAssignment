@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BusinessObjects.Entities;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Impl;
 using Repositories.Interface;
 
 namespace Repositories.Implementation

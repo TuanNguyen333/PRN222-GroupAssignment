@@ -3,6 +3,38 @@
   "WorkspaceRootPath": "D:\\Ass03Solution\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|d:\\ass03solution\\services\\security\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|solutionrelative:services\\security\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|d:\\ass03solution\\services\\security\\jwtprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|solutionrelative:services\\security\\jwtprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|d:\\ass03solution\\services\\implementation\\memberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3CE6A6EB-4FD8-4E9C-A5AD-C185D47C88AC}|Services\\Services.csproj|solutionrelative:services\\implementation\\memberservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6E2561A6-A9A0-8B76-749F-D9DB18D15A3F}|UnitTests\\UnitTests.csproj|d:\\ass03solution\\unittests\\category\\categorycontrollertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6E2561A6-A9A0-8B76-749F-D9DB18D15A3F}|UnitTests\\UnitTests.csproj|solutionrelative:unittests\\category\\categorycontrollertest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|d:\\ass03solution\\estore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|solutionrelative:estore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|d:\\ass03solution\\estore\\components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|solutionrelative:estore\\components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -43,16 +75,8 @@
       "RelativeMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|solutionrelative:estore\\services\\auth\\authenticationheaderhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\extensions\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\extensions\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|solutionrelative:api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F5825D92-A648-4BD6-AF81-8F681777983E}|API\\API.csproj|d:\\ass03solution\\api\\controllers\\ordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -60,10 +84,6 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\dotnet\\sdk\\9.0.201\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|d:\\ass03solution\\estore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|solutionrelative:estore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{ECC8F330-B52A-4402-9163-10BD2556EBAB}|eStore\\eStore.csproj|d:\\ass03solution\\estore\\components\\pages\\error.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -120,7 +140,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 258,
-          "SelectedChildIndex": 12,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -144,40 +164,28 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:9:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
-            },
-            {
-              "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Ass03Solution\\API\\Program.cs",
-              "RelativeDocumentMoniker": "API\\Program.cs",
-              "ToolTip": "D:\\Ass03Solution\\API\\Program.cs",
-              "RelativeToolTip": "API\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-04T02:47:43.905Z"
+              "$type": "Bookmark",
+              "Name": "ST:9:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Index.razor",
-              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Index.razor",
-              "RelativeDocumentMoniker": "eStore\\Components\\Pages\\CategoryPages\\Index.razor",
-              "ToolTip": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Index.razor",
-              "RelativeToolTip": "eStore\\Components\\Pages\\CategoryPages\\Index.razor",
-              "ViewState": "AgIAACUBAAAAAAAAAAAAADsBAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T02:23:18.725Z",
+              "DocumentIndex": 0,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\Services\\Security\\AuthService.cs",
+              "RelativeDocumentMoniker": "Services\\Security\\AuthService.cs",
+              "ToolTip": "D:\\Ass03Solution\\Services\\Security\\AuthService.cs",
+              "RelativeToolTip": "Services\\Security\\AuthService.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAQwCEAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T12:22:07.977Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 9,
               "Title": "StateContainer.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Services\\Common\\StateContainer.cs",
               "RelativeDocumentMoniker": "eStore\\Services\\Common\\StateContainer.cs",
@@ -190,7 +198,124 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "NavMenu.razor",
+              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Layout\\NavMenu.razor",
+              "RelativeDocumentMoniker": "eStore\\Components\\Layout\\NavMenu.razor",
+              "ToolTip": "D:\\Ass03Solution\\eStore\\Components\\Layout\\NavMenu.razor",
+              "RelativeToolTip": "eStore\\Components\\Layout\\NavMenu.razor",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAAE4AAAB4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-01T11:57:50.27Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Ass03Solution\\API\\appsettings.json",
+              "RelativeDocumentMoniker": "API\\appsettings.json",
+              "ToolTip": "D:\\Ass03Solution\\API\\appsettings.json",
+              "RelativeToolTip": "API\\appsettings.json",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-03T11:36:58.593Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\API\\Program.cs",
+              "RelativeDocumentMoniker": "API\\Program.cs",
+              "ToolTip": "D:\\Ass03Solution\\API\\Program.cs",
+              "RelativeToolTip": "API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T02:47:43.905Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CategoryControllerTest.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\UnitTests\\Category\\CategoryControllerTest.cs",
+              "RelativeDocumentMoniker": "UnitTests\\Category\\CategoryControllerTest.cs",
+              "ToolTip": "D:\\Ass03Solution\\UnitTests\\Category\\CategoryControllerTest.cs",
+              "RelativeToolTip": "UnitTests\\Category\\CategoryControllerTest.cs",
+              "ViewState": "AgIAAGEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T12:16:40.415Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "API\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\Ass03Solution\\API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwB0AAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T12:17:02.77Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Program.cs",
+              "RelativeDocumentMoniker": "eStore\\Program.cs",
+              "ToolTip": "D:\\Ass03Solution\\eStore\\Program.cs",
+              "RelativeToolTip": "eStore\\Program.cs",
+              "ViewState": "AgIAAIYAAAAAAAAAAAAjwIsAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-28T13:17:44.699Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MemberService.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\Services\\Implementation\\MemberService.cs",
+              "RelativeDocumentMoniker": "Services\\Implementation\\MemberService.cs",
+              "ToolTip": "D:\\Ass03Solution\\Services\\Implementation\\MemberService.cs",
+              "RelativeToolTip": "Services\\Implementation\\MemberService.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T12:21:17.97Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "JwtProvider.cs",
+              "DocumentMoniker": "D:\\Ass03Solution\\Services\\Security\\JwtProvider.cs",
+              "RelativeDocumentMoniker": "Services\\Security\\JwtProvider.cs",
+              "ToolTip": "D:\\Ass03Solution\\Services\\Security\\JwtProvider.cs",
+              "RelativeToolTip": "Services\\Security\\JwtProvider.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAQwBgAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T12:25:16.129Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.razor",
+              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Index.razor",
+              "RelativeDocumentMoniker": "eStore\\Components\\Pages\\CategoryPages\\Index.razor",
+              "ToolTip": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Index.razor",
+              "RelativeToolTip": "eStore\\Components\\Pages\\CategoryPages\\Index.razor",
+              "ViewState": "AgIAACUBAAAAAAAAAAAAADsBAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-04T02:23:18.725Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "Create.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Create.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\CategoryPages\\Create.razor",
@@ -203,7 +328,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 10,
               "Title": "AuthService.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Services\\Auth\\AuthService.cs",
               "RelativeDocumentMoniker": "eStore\\Services\\Auth\\AuthService.cs",
@@ -216,20 +341,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "NavMenu.razor",
-              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Layout\\NavMenu.razor",
-              "RelativeDocumentMoniker": "eStore\\Components\\Layout\\NavMenu.razor",
-              "ToolTip": "D:\\Ass03Solution\\eStore\\Components\\Layout\\NavMenu.razor*",
-              "RelativeToolTip": "eStore\\Components\\Layout\\NavMenu.razor*",
-              "ViewState": "AgIAAC0AAAAAAAAAAAAAADMAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-01T11:57:50.27Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 16,
               "Title": "ProductController.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\API\\Controllers\\ProductController.cs",
               "RelativeDocumentMoniker": "API\\Controllers\\ProductController.cs",
@@ -242,7 +354,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 12,
               "Title": "Edit.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\CategoryPages\\Edit.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\CategoryPages\\Edit.razor",
@@ -255,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 14,
               "Title": "Create.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\ProductPages\\Create.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\ProductPages\\Create.razor",
@@ -268,7 +380,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 17,
               "Title": "AuthenticationHeaderHandler.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Services\\Auth\\AuthenticationHeaderHandler.cs",
               "RelativeDocumentMoniker": "eStore\\Services\\Auth\\AuthenticationHeaderHandler.cs",
@@ -281,7 +393,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 15,
               "Title": "CategoryController.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\API\\Controllers\\CategoryController.cs",
               "RelativeDocumentMoniker": "API\\Controllers\\CategoryController.cs",
@@ -294,19 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\Ass03Solution\\API\\appsettings.json",
-              "RelativeDocumentMoniker": "API\\appsettings.json",
-              "ToolTip": "D:\\Ass03Solution\\API\\appsettings.json",
-              "RelativeToolTip": "API\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-04-03T11:36:58.593Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 18,
               "Title": "ServiceExtensions.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\API\\Extensions\\ServiceExtensions.cs",
               "RelativeDocumentMoniker": "API\\Extensions\\ServiceExtensions.cs",
@@ -318,7 +418,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 19,
               "Title": "OrderController.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\API\\Controllers\\OrderController.cs",
               "RelativeDocumentMoniker": "API\\Controllers\\OrderController.cs",
@@ -330,7 +430,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 20,
               "Title": "Microsoft.PackageDependencyResolution.targets",
               "DocumentMoniker": "C:\\Program Files\\dotnet\\sdk\\9.0.201\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
               "ToolTip": "C:\\Program Files\\dotnet\\sdk\\9.0.201\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
@@ -340,19 +440,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Program.cs",
-              "RelativeDocumentMoniker": "eStore\\Program.cs",
-              "ToolTip": "D:\\Ass03Solution\\eStore\\Program.cs",
-              "RelativeToolTip": "eStore\\Program.cs",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAuwAsAAAApAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-28T13:17:44.699Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 22,
               "Title": "Home.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\Home.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\Home.razor",
@@ -364,7 +452,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 23,
               "Title": "Weather.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\Weather.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\Weather.razor",
@@ -376,7 +464,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 24,
               "Title": "Routes.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Routes.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Routes.razor",
@@ -388,7 +476,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 21,
               "Title": "Error.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\Error.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\Error.razor",
@@ -400,7 +488,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 25,
               "Title": "eStore.csproj",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\eStore.csproj",
               "RelativeDocumentMoniker": "eStore\\eStore.csproj",
@@ -412,7 +500,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 26,
               "Title": "Counter.razor",
               "DocumentMoniker": "D:\\Ass03Solution\\eStore\\Components\\Pages\\Counter.razor",
               "RelativeDocumentMoniker": "eStore\\Components\\Pages\\Counter.razor",
@@ -424,7 +512,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 27,
               "Title": "5kubjhhg..sql",
               "DocumentMoniker": "C:\\Users\\HIEU\\AppData\\Local\\Temp\\5kubjhhg..sql",
               "ToolTip": "C:\\Users\\HIEU\\AppData\\Local\\Temp\\5kubjhhg..sql",
@@ -433,7 +521,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 28,
               "Title": "cemyhrhe..sql",
               "DocumentMoniker": "C:\\Users\\HIEU\\AppData\\Local\\Temp\\cemyhrhe..sql",
               "ToolTip": "C:\\Users\\HIEU\\AppData\\Local\\Temp\\cemyhrhe..sql",
@@ -442,7 +530,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 29,
               "Title": "dbo.Member.sql",
               "DocumentMoniker": "ViewDataWindow_MSSQL__/DESKTOP_U7S0IJ5_NGUYENVANDAT/eStoreDB/sa/SqlTable/dbo.Member.sql",
               "ToolTip": "ViewDataWindow_MSSQL__/DESKTOP_U7S0IJ5_NGUYENVANDAT/eStoreDB/sa/SqlTable/dbo.Member.sql",
@@ -451,7 +539,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 30,
               "Title": "dbo.Categories.sql",
               "DocumentMoniker": "ViewDataWindow_MSSQL__/DESKTOP_U7S0IJ5_NGUYENVANDAT/eStoreDB/sa/SqlTable/dbo.Categories.sql",
               "ToolTip": "ViewDataWindow_MSSQL__/DESKTOP_U7S0IJ5_NGUYENVANDAT/eStoreDB/sa/SqlTable/dbo.Categories.sql",
@@ -460,7 +548,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 31,
               "Title": "AuthService.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\BusinessObject\\Services\\AuthService.cs",
               "RelativeDocumentMoniker": "BusinessObject\\Services\\AuthService.cs",
@@ -471,7 +559,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 32,
               "Title": "eStoreDB.sql",
               "DocumentMoniker": "C:\\Users\\HIEU\\Downloads\\eStoreDB.sql",
               "ToolTip": "C:\\Users\\HIEU\\Downloads\\eStoreDB.sql",
@@ -480,7 +568,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 33,
               "Title": "JwtProvider.cs",
               "DocumentMoniker": "D:\\Ass03Solution\\BusinessObject\\Services\\JwtProvider.cs",
               "RelativeDocumentMoniker": "BusinessObject\\Services\\JwtProvider.cs",

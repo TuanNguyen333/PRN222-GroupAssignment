@@ -1,6 +1,5 @@
 ﻿using BusinessObjects.Entities;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Impl;
 using Repositories.Interface;
 using System;
 using System.Collections.Generic;
