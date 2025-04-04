@@ -100,22 +100,25 @@ namespace API.Controllers
             }
             return NoContent();
         }
-
-        [HttpGet("order/{orderId}")]
+        
+        [HttpGet("export")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByOrderId(
-            int orderId,
-            [FromQuery] int? pageNumber = null,
-            [FromQuery] int? pageSize = null)
+        public async Task<IActionResult> ExportToExcel([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            var response = await _orderDetailService.GetByOrderIdAsync(orderId, pageNumber, pageSize);
-            if (!response.Success)
+            try
             {
-                return NotFound(response);
+                var stream = await _orderDetailService.ExportOrderDetailsToExcelAsync(startDate, endDate);
+                stream.Position = 0;
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = $"OrderDetails_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.xlsx";
+                return File(stream, contentType, fileName);
             }
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
+            }
         }
     }
 }

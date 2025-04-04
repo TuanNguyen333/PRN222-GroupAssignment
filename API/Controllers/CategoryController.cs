@@ -22,17 +22,21 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll([FromQuery] int? pageNumber = null, [FromQuery] int? pageSize = null)
+        public async Task<IActionResult> GetAll(
+      [FromQuery] int? pageNumber = null,
+      [FromQuery] int? pageSize = null,
+      [FromQuery] string? search = null)
         {
-            var response = await _categoryService.GetAllAsync(pageNumber, pageSize);
+            var response = await _categoryService.GetAllAsync(pageNumber, pageSize, search);
             if (!response.Success)
             {
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
 
-       
+
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

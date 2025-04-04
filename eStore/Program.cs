@@ -90,6 +90,7 @@ namespace eStore
                 client.Timeout = TimeSpan.FromSeconds(30);
             }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
 
+            // Add SignalR for real-time updates
             builder.Services.AddSignalR();
 
             // Add core services first
@@ -130,9 +131,11 @@ namespace eStore
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
+            // Map SignalR hubs for real-time updates
             app.MapHub<ProductHub>("/producthub");
             app.MapHub<OrderHub>("/orderhub");
             app.MapHub<MemberHub>("/memberhub");
+            app.MapHub<CategoryHub>("/categoryhub");  // CategoryHub is already registered here
 
             app.Run();
         }
