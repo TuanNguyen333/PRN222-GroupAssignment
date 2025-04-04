@@ -21,5 +21,6 @@ namespace Services.Interface
         Task<ApiResponse<string>> DeleteAsync(int id);
         Task<ApiResponse<OrderDetailDto>> GetByIdAsync(int orderId, int productId);
         Task<MemoryStream> ExportOrderDetailsToExcelAsync(DateTime startDate, DateTime endDate);
+        Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null, int? pageSize = null);
     }
 }

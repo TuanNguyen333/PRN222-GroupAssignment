@@ -21,5 +21,14 @@ namespace Repositories.Implementation
                                                .FirstOrDefaultAsync(od => od.OrderId == orderId && od.ProductId == productId);
             return orderDetail;
         }
+
+        public async Task<IEnumerable<OrderDetail>> GetByOrderIdAsync(int orderId)
+        {
+            return await _context.OrderDetails
+                .Include(od => od.Order)
+                .Include(od => od.Product)
+                .Where(od => od.OrderId == orderId)
+                .ToListAsync();
+        }
     }
 }

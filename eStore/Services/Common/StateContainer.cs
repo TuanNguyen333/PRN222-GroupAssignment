@@ -11,18 +11,26 @@ namespace eStore.Services.Common
 
         public void SetAuthData(string token, long expirationTime)
         {
+            Console.WriteLine($"Setting auth data. Token length: {token?.Length ?? 0}, ExpirationTime: {expirationTime}");
             AuthToken = token;
             ExpirationTime = expirationTime;
+            Console.WriteLine($"Auth data set. IsAuthenticated: {IsAuthenticated}");
             NotifyStateChanged();
         }
 
         public void ClearAuthData()
         {
+            Console.WriteLine("Clearing auth data");
             AuthToken = null;
             ExpirationTime = 0;
+            Console.WriteLine("Auth data cleared");
             NotifyStateChanged();
         }
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        private void NotifyStateChanged()
+        {
+            Console.WriteLine("Notifying state change");
+            OnChange?.Invoke();
+        }
     }
 }

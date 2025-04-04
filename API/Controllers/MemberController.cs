@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Services.Interface;
 using BusinessObjects.Dto.Member;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -15,6 +17,28 @@ namespace API.Controllers
         public MemberController(IMemberService memberService)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+        }
+
+        [HttpGet("user")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int memberId))
+            {
+                return Unauthorized(new { Success = false, Message = "Invalid user token" });
+            }
+
+            var response = await _memberService.GetByIdAsync(memberId);
+            if (!response.Success)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet]
