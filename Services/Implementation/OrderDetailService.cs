@@ -9,6 +9,7 @@ using BusinessObjects.Dto.OrderDetail;
 using BusinessObjects.Dto.Product;
 using BusinessObjects.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using Repositories.Interface;
 using Services.Interface;
@@ -238,6 +239,127 @@ namespace Services.Implementation
             }
         }
 
+        public async Task<IActionResult> ExportOrderDetailsToExcel(
+            int? pageNumber = null,
+            int? pageSize = null,
+            decimal? minUnitPrice = null,
+            decimal? maxUnitPrice = null,
+            int? minQuantity = null,
+            int? maxQuantity = null,
+            double? minDiscount = null,
+            double? maxDiscount = null)
+        {
+            try
+            {
+                // Default values when pageNumber or pageSize is null
+                int actualPageNumber = pageNumber ?? 1;
+                int actualPageSize = pageSize ?? int.MaxValue;
+
+                // Fetch order details
+                var allOrderDetails =
+                    await _unitOfWork.OrderDetailRepository.GetAllAsync(actualPageNumber, actualPageSize);
+
+                // Apply filters
+                var filteredOrderDetails = ApplyFilters(allOrderDetails, minUnitPrice, maxUnitPrice, minQuantity,
+                    maxQuantity, minDiscount, maxDiscount);
+
+                // Map each OrderDetail to OrderDetailDto
+                var orderDetailDtos = new List<OrderDetailDto>();
+                foreach (var orderDetail in filteredOrderDetails)
+                {
+                    var orderDto = await _unitOfWork.OrderRepository.GetByIdAsync(orderDetail.OrderId);
+                    var productDto = await _unitOfWork.ProductRepository.GetByIdAsync(orderDetail.ProductId);
+
+                    var orderDetailDto = new OrderDetailDto
+                    {
+                        OrderId = orderDetail.OrderId,
+                        OrderDto = _mapper.Map<OrderDto>(orderDto),
+                        ProductId = orderDetail.ProductId,
+                        ProductDto = _mapper.Map<ProductDto>(productDto),
+                        UnitPrice = orderDetail.UnitPrice,
+                        Quantity = orderDetail.Quantity,
+                        Discount = orderDetail.Discount
+                    };
+
+                    orderDetailDtos.Add(orderDetailDto);
+                }
+
+                // Create the Excel file
+                var excelPackage = new ExcelPackage();
+                var worksheet = excelPackage.Workbook.Worksheets.Add("OrderDetails");
+
+                // Set the header row
+                worksheet.Cells[1, 1].Value = "OrderId";
+                worksheet.Cells[1, 2].Value = "MemberId";
+                worksheet.Cells[1, 3].Value = "OrderDate";
+                worksheet.Cells[1, 4].Value = "RequiredDate";
+                worksheet.Cells[1, 5].Value = "ShippedDate";
+                worksheet.Cells[1, 6].Value = "Freight";
+                worksheet.Cells[1, 7].Value = "ProductId";
+                worksheet.Cells[1, 8].Value = "CategoryId";
+                worksheet.Cells[1, 9].Value = "ProductName";
+                worksheet.Cells[1, 10].Value = "Weight";
+                worksheet.Cells[1, 11].Value = "UnitPrice";
+                worksheet.Cells[1, 12].Value = "UnitsInStock";
+                worksheet.Cells[1, 13].Value = "Quantity";
+                worksheet.Cells[1, 14].Value = "Discount";
+
+                // Set column widths
+                worksheet.Column(3).Width = 15; // OrderDate
+                worksheet.Column(4).Width = 15; // RequiredDate
+                worksheet.Column(5).Width = 15; // ShippedDate
+                worksheet.Column(9).Width = 20; // ProductName
+
+                // Add data rows
+                int row = 2;
+                foreach (var dto in orderDetailDtos)
+                {
+                    worksheet.Cells[row, 1].Value = dto.OrderId;
+                    worksheet.Cells[row, 2].Value = dto.OrderDto?.MemberId;
+                    worksheet.Cells[row, 3].Value = dto.OrderDto?.OrderDate;
+                    worksheet.Cells[row, 3].Style.Numberformat.Format = "dd-mm-yyyy";
+                    worksheet.Cells[row, 4].Value = dto.OrderDto?.RequiredDate;
+                    worksheet.Cells[row, 4].Style.Numberformat.Format = "dd-mm-yyyy";
+                    worksheet.Cells[row, 5].Value = dto.OrderDto?.ShippedDate;
+                    worksheet.Cells[row, 5].Style.Numberformat.Format = "dd-mm-yyyy";
+                    worksheet.Cells[row, 6].Value = dto.OrderDto?.Freight;
+                    worksheet.Cells[row, 7].Value = dto.ProductId;
+                    worksheet.Cells[row, 8].Value = dto.ProductDto?.CategoryId;
+                    worksheet.Cells[row, 9].Value = dto.ProductDto?.ProductName;
+                    worksheet.Cells[row, 10].Value = dto.ProductDto?.Weight;
+                    worksheet.Cells[row, 11].Value = dto.UnitPrice;
+                    worksheet.Cells[row, 12].Value = dto.ProductDto?.UnitsInStock;
+                    worksheet.Cells[row, 13].Value = dto.Quantity;
+                    worksheet.Cells[row, 14].Value = dto.Discount;
+                    row++;
+                }
+
+                // Save the Excel file to memory
+                var stream = new MemoryStream();
+                excelPackage.SaveAs(stream);
+                stream.Position = 0;
+
+                string fileName = $"OrderDetails_Export_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                // Create FileContentResult directly without using the File() method
+                return new FileContentResult(stream.ToArray(), contentType)
+                {
+                    FileDownloadName = fileName
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new
+                    {
+                        Success = false,
+                        Message = "Failed to export order details to Excel",
+                        Errors = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.Message)
+                    })
+                    { StatusCode = 500 };
+            }
+        }
+
         // Filtering logic
         private IEnumerable<OrderDetail> ApplyFilters(
             IEnumerable<OrderDetail> orderDetails,
@@ -288,7 +410,8 @@ namespace Services.Implementation
             return (actualPageNumber, actualPageSize, pagedOrderDetails);
         }
 
-        public async Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null, int? pageSize = null)
+        public async Task<PagedApiResponse<OrderDetailDto>> GetByOrderIdAsync(int orderId, int? pageNumber = null,
+            int? pageSize = null)
         {
             try
             {
@@ -430,7 +553,7 @@ namespace Services.Implementation
         {
             var orderDetails = await _unitOfWork.OrderDetailRepository.GetAllAsync(1, int.MaxValue);
             var filteredOrderDetails = orderDetails
-                .Where(od => od.Order.OrderDate >= startDate && od.Order.OrderDate <= endDate)
+                .Where(od => od.Order != null && od.Order.OrderDate >= startDate && od.Order.OrderDate <= endDate)
                 .Select(od => new OrderDetailDto
                 {
                     OrderId = od.OrderId,
@@ -438,15 +561,17 @@ namespace Services.Implementation
                     UnitPrice = od.UnitPrice,
                     Quantity = od.Quantity,
                     Discount = od.Discount,
-                    OrderDto = new OrderDto
-                    {
-                        OrderId = od.Order.OrderId,
-                        OrderDate = od.Order.OrderDate,
-                        Freight = od.Order.Freight,
-                        MemberId = od.Order.MemberId,
-                        RequiredDate = od.Order.RequiredDate,
-                        ShippedDate = od.Order.ShippedDate
-                    },
+                    OrderDto = od.Order != null
+                        ? new OrderDto
+                        {
+                            OrderId = od.Order.OrderId,
+                            OrderDate = od.Order.OrderDate,
+                            Freight = od.Order.Freight,
+                            MemberId = od.Order.MemberId,
+                            RequiredDate = od.Order.RequiredDate,
+                            ShippedDate = od.Order.ShippedDate
+                        }
+                        : null,
                     ProductDto = new ProductDto
                     {
                         ProductId = od.Product.ProductId,
