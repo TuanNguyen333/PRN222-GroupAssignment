@@ -822,3 +822,4 @@ API/appsettings.Development.json
 # Ignore .nuget files
 **/obj/*.nuget.dgspec.json
 **/obj/*.nuget.g.props
+eStore/appsettings.json
