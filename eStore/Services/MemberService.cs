@@ -383,6 +383,32 @@ namespace eStore.Services
             }
         }
 
+        public async Task<ApiResponse<Member>> UpdateCurrentUserAsync(Member member)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync("api/members/user", member);
+                var result = await HandleResponse<Member>(response);
+                
+                if (result.Success && result.Data != null)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMemberUpdate", "update", result.Data.MemberId);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating current user");
+                return new ApiResponse<Member>
+                {
+                    Success = false,
+                    Message = "Error updating current user",
+                    Errors = new[] { ex.Message }
+                };
+            }
+        }
+
         private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
