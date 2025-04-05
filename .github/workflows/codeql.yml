@@ -42,10 +42,10 @@ jobs:
           build-mode: ${{ matrix.build-mode }}
 
       - name: Restore NuGet packages
-        run: dotnet restore MyAspNetApp.sln
+        run: dotnet restore Ass03Solution.sln
 
       - name: Build ASP.NET project
-        run: dotnet build MyAspNetApp.sln --configuration Release --no-restore
+        run: dotnet build Ass03Solution.sln --configuration Release --no-restore
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
