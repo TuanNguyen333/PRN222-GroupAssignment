@@ -185,34 +185,38 @@ namespace Services.Implementation
             {
                 // Default values when pageNumber or pageSize is null
                 int actualPageNumber = pageNumber ?? 1;
-                int actualPageSize = pageSize ?? int.MaxValue;
+                int actualPageSize = pageSize ?? 10; // Setting a reasonable default
 
-                // Fetch all order details
-                var allOrderDetails =
-                    await _unitOfWork.OrderDetailRepository.GetAllAsync(actualPageNumber, actualPageSize);
+                // Use a very large page size to get all records in one request
+                // This is a workaround since we can't modify the repository
+                var allOrderDetails = await _unitOfWork.OrderDetailRepository.GetAllAsync(1, int.MaxValue);
 
-                // Apply filters
+                // Apply filters to all data
                 var filteredOrderDetails = ApplyFilters(allOrderDetails, minUnitPrice, maxUnitPrice, minQuantity,
                     maxQuantity, minDiscount, maxDiscount);
+
+                // Get the total count after filtering
                 var totalItems = filteredOrderDetails.Count();
 
-                // Handle pagination
-                var (finalPageNumber, finalPageSize, pagedOrderDetails) =
-                    ApplyPagination(filteredOrderDetails, actualPageNumber, actualPageSize);
+                // Apply pagination to the filtered results
+                var pagedOrderDetails = filteredOrderDetails
+                    .Skip((actualPageNumber - 1) * actualPageSize)
+                    .Take(actualPageSize)
+                    .ToList();
 
                 // Map each OrderDetail to OrderDetailDto manually
                 var orderDetailDtos = new List<OrderDetailDto>();
                 foreach (var orderDetail in pagedOrderDetails)
                 {
-                    var orderDto = await _unitOfWork.OrderRepository.GetByIdAsync(orderDetail.OrderId);
-                    var productDto = await _unitOfWork.ProductRepository.GetByIdAsync(orderDetail.ProductId);
+                    var order = await _unitOfWork.OrderRepository.GetByIdAsync(orderDetail.OrderId);
+                    var product = await _unitOfWork.ProductRepository.GetByIdAsync(orderDetail.ProductId);
 
                     var orderDetailDto = new OrderDetailDto
                     {
                         OrderId = orderDetail.OrderId,
-                        OrderDto = _mapper.Map<OrderDto>(orderDto),
+                        OrderDto = _mapper.Map<OrderDto>(order),
                         ProductId = orderDetail.ProductId,
-                        ProductDto = _mapper.Map<ProductDto>(productDto),
+                        ProductDto = _mapper.Map<ProductDto>(product),
                         UnitPrice = orderDetail.UnitPrice,
                         Quantity = orderDetail.Quantity,
                         Discount = orderDetail.Discount
@@ -223,8 +227,8 @@ namespace Services.Implementation
 
                 return PagedApiResponse<OrderDetailDto>.SuccessPagedResponse(
                     orderDetailDtos,
-                    finalPageNumber,
-                    finalPageSize,
+                    actualPageNumber,
+                    actualPageSize,
                     totalItems,
                     "Order details retrieved successfully");
             }

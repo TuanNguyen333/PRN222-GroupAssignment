@@ -509,6 +509,27 @@ namespace eStore.Services
             }
         }
 
+        public async Task<byte[]> ExportAllOrdersToExcelAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/orders/export");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Failed to export orders to Excel. Status code: {StatusCode}", response.StatusCode);
+                    throw new Exception($"Failed to export orders. Server returned status code: {response.StatusCode}");
+                }
+                
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting orders to Excel");
+                throw;
+            }
+        }
+
         private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();

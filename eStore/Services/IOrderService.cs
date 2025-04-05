@@ -24,5 +24,6 @@ namespace eStore.Services
             decimal? maxFreight = null,
             DateTime? fromDate = null,
             DateTime? toDate = null);
+        Task<byte[]> ExportAllOrdersToExcelAsync();
     }
 }

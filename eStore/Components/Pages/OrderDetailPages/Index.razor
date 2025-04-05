@@ -1,16 +1,34 @@
 ﻿@page "/orderdetails"
 @using eStore.Models
 @using eStore.Services
+@using System.IO
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
 @inject IOrderDetailService OrderDetailService
 @inject NavigationManager NavigationManager
 @inject ILogger<Index> Logger
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Order Details</PageTitle>
 
 <div class="container-fluid">
     <div class="row mb-3">
-        <div class="col">
+        <div class="col-8">
             <h1>Order Details</h1>
+        </div>
+        <div class="col-4 text-end">
+            <button class="btn btn-success" @onclick="ExportToExcel" disabled="@isExporting">
+                @if (isExporting)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>Exporting...</span>
+                }
+                else
+                {
+                    <i class="bi bi-file-earmark-excel"></i>
+                    <span>Export to Excel</span>
+                }
+            </button>
         </div>
     </div>
 
@@ -76,9 +94,44 @@
                     </table>
                 </div>
 
+                @if (orderDetails.Data.TotalPages > 1)
+                {
+                    <nav aria-label="Order details pagination">
+                        <ul class="pagination justify-content-center">
+                            @if (orderDetails.Data.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <button type="button" class="page-link" @onclick="async () => await LoadOrderDetails(orderDetails.Data.PageNumber - 1)">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </button>
+                                </li>
+                            }
+
+                            @for (int i = 1; i <= orderDetails.Data.TotalPages; i++)
+                            {
+                                var pageNumber = i;
+                                <li class="page-item @(pageNumber == orderDetails.Data.PageNumber ? "active" : "")">
+                                    <button type="button" class="page-link" @onclick="async () => await LoadOrderDetails(pageNumber)">@pageNumber</button>
+                                </li>
+                            }
+
+                            @if (orderDetails.Data.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <button type="button" class="page-link" @onclick="async () => await LoadOrderDetails(orderDetails.Data.PageNumber + 1)">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+
                 <div class="text-center mt-3">
                     <small class="text-muted">
-                        Showing @orderDetails.Data.Items.Count of @orderDetails.Data.TotalItems entries
+                        Showing @((orderDetails.Data.PageNumber - 1) * orderDetails.Data.PageSize + 1) to 
+                        @(Math.Min(orderDetails.Data.PageNumber * orderDetails.Data.PageSize, orderDetails.Data.TotalItems)) 
+                        of @orderDetails.Data.TotalItems order details
                     </small>
                 </div>
             </div>
@@ -89,16 +142,17 @@
 @code {
     private ApiResponse<PagedResponse<OrderDetailDto>>? orderDetails;
     private bool isLoading = true;
+    private bool isExporting = false;
     private string message = string.Empty;
     private string messageClass = string.Empty;
-    private const int MaxPageSize = 1000; // Very large page size to show all records
+    private const int PageSize = 10; // Set standard page size
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAllOrderDetails();
+        await LoadOrderDetails(1); // Start with page 1
     }
 
-    private async Task LoadAllOrderDetails()
+    private async Task LoadOrderDetails(int page)
     {
         try
         {
@@ -107,12 +161,12 @@
             messageClass = string.Empty;
             StateHasChanged();
 
-            Console.WriteLine("Loading all order details without pagination");
+            Console.WriteLine($"Loading order details page {page} with page size {PageSize}");
             
-            // Call API with large page size to effectively disable pagination
+            // Call API with pagination
             orderDetails = await OrderDetailService.GetAllAsync(
-                pageNumber: 1,
-                pageSize: MaxPageSize);
+                pageNumber: page,
+                pageSize: PageSize);
 
             if (orderDetails == null)
             {
@@ -141,7 +195,7 @@
                 return;
             }
 
-            Console.WriteLine($"Loaded all {orderDetails.Data.TotalItems} order details");
+            Console.WriteLine($"Loaded {orderDetails.Data.Items?.Count ?? 0} order details (page {orderDetails.Data.PageNumber} of {orderDetails.Data.TotalPages})");
         }
         catch (HttpRequestException ex)
         {
@@ -158,6 +212,40 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ExportToExcel()
+    {
+        try
+        {
+            isExporting = true;
+            message = string.Empty;
+            messageClass = string.Empty;
+            StateHasChanged();
+            
+            // Call the service method to get Excel data
+            var excelData = await OrderDetailService.ExportToExcelAsync();
+            
+            // Use the JavaScript interop method that works with the Orders page
+            await JSRuntime.InvokeVoidAsync("downloadFileFromStream", 
+                $"OrderDetails_Export_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx", 
+                Convert.ToBase64String(excelData));
+            
+            message = "Excel file downloaded successfully.";
+            messageClass = "alert-success";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Export error: {ex.Message}");
+            message = $"Error exporting to Excel: {ex.Message}";
+            messageClass = "alert-danger";
+            Logger.LogError(ex, "Error during Excel export");
+        }
+        finally
+        {
+            isExporting = false;
             StateHasChanged();
         }
     }

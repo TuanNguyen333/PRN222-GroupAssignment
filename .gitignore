@@ -812,3 +812,13 @@ fabric.properties
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,dotnetcore,csharp,aspnetcore,rider
+
+# Ignore appsettings.Development.json
+API/appsettings.Development.json
+
+# Ignore project.assets.json files
+**/obj/project.assets.json
+
+# Ignore .nuget files
+**/obj/*.nuget.dgspec.json
+**/obj/*.nuget.g.props

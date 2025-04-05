@@ -446,6 +446,57 @@ namespace eStore.Services
                 };
             }
         }
+
+        public async Task<byte[]> ExportToExcelAsync(
+            int? pageNumber = null,
+            int? pageSize = null,
+            decimal? minUnitPrice = null,
+            decimal? maxUnitPrice = null,
+            int? minQuantity = null,
+            int? maxQuantity = null,
+            double? minDiscount = null,
+            double? maxDiscount = null)
+        {
+            try
+            {
+                var url = "api/orderdetails/export";
+                Console.WriteLine($"Making direct export request to: {url}");
+                
+                // Use a direct HTTP GET request instead of a custom message
+                _httpClient.DefaultRequestHeaders.Accept.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
+                
+                var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                Console.WriteLine($"Export API response status: {response.StatusCode}");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Export API error: {response.StatusCode}, Content: {errorContent}");
+                    throw new Exception($"Export failed with status code {response.StatusCode}: {errorContent}");
+                }
+                
+                // Read the file bytes directly
+                var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                Console.WriteLine($"Received file size: {fileBytes.Length} bytes");
+                
+                if (fileBytes.Length == 0)
+                {
+                    throw new Exception("Received empty file from server");
+                }
+                
+                return fileBytes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Export error: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                throw;
+            }
+        }
     }
 }
 
