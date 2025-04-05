@@ -59,7 +59,7 @@ namespace eStore
             // Configure HttpClient for ProductService
             builder.Services.AddHttpClient<IProductService, ProductService>(client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.BaseAddress = new Uri("https://prn222-cubgc7bfd6h9a5ak.southeastasia-01.azurewebsites.net/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
             }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
@@ -67,7 +67,7 @@ namespace eStore
             // Configure HttpClient for CategoryService
             builder.Services.AddHttpClient<ICategoryService, CategoryService>(client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.BaseAddress = new Uri("https://prn222-cubgc7bfd6h9a5ak.southeastasia-01.azurewebsites.net/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
             }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
@@ -75,7 +75,7 @@ namespace eStore
             // Configure HttpClient for MemberService
             builder.Services.AddHttpClient<IMemberService, MemberService>(client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.BaseAddress = new Uri("https://prn222-cubgc7bfd6h9a5ak.southeastasia-01.azurewebsites.net/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
             })
@@ -85,7 +85,7 @@ namespace eStore
             // Configure HttpClient for OrderDetailService
             builder.Services.AddHttpClient<IOrderDetailService, OrderDetailService>(client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.BaseAddress = new Uri("https://prn222-cubgc7bfd6h9a5ak.southeastasia-01.azurewebsites.net/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
             }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
@@ -101,7 +101,7 @@ namespace eStore
             builder.Services.AddScoped<AuthenticationHeaderHandler>();
             builder.Services.AddHttpClient("API", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7173/");
+                client.BaseAddress = new Uri("https://prn222-cubgc7bfd6h9a5ak.southeastasia-01.azurewebsites.net/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.Timeout = TimeSpan.FromSeconds(30);
             })

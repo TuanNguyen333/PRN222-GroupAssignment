@@ -105,7 +105,7 @@
                 if (product.CategoryId > 0)
                 {
                     var categoryResponse = await CategoryService.GetCategoryByIdAsync(product.CategoryId);
-                    categoryName = categoryResponse?.CategoryName ?? "Unknown Category";
+                    categoryName = categoryResponse?.Data?.CategoryName ?? "Unknown Category";
                 }
             }
             else

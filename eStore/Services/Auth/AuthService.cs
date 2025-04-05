@@ -3,6 +3,8 @@ using System.Text.Json;
 using BusinessObjects.Dto.Auth;
 using BusinessObjects.Base;
 using eStore.Services.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace eStore.Services.Auth
 {
@@ -21,7 +23,7 @@ namespace eStore.Services.Auth
         {
             Console.WriteLine("Attempting to login...");
             var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginDto);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Login request successful");
@@ -29,19 +31,48 @@ namespace eStore.Services.Auth
                 if (result?.Success == true && result.Data != null)
                 {
                     Console.WriteLine($"Login successful, token length: {result.Data.Token?.Length ?? 0}");
-                    _stateContainer.SetAuthData(result.Data.Token, result.Data.ExpirationTime);
-                    Console.WriteLine("Token stored in StateContainer");
+
+                    // Extract role from token
+                    var role = ExtractRoleFromToken(result.Data.Token);
+                    Console.WriteLine($"Extracted role from token: {role}");
+
+                    // Store the auth data and role
+                    _stateContainer.SetAuthData(result.Data.Token, result.Data.ExpirationTime, role);
+                    Console.WriteLine("Token and role stored in StateContainer");
                     return result;
                 }
-                
+
                 Console.WriteLine($"Login response not successful or data is null. Success: {result?.Success}, HasData: {result?.Data != null}");
                 return result ?? ApiResponse<AuthenticationResponse>.ErrorResponse("Invalid response format");
             }
-            
+
             Console.WriteLine($"Login failed with status code: {response.StatusCode}");
             var errorContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Error content: {errorContent}");
             return ApiResponse<AuthenticationResponse>.ErrorResponse("Login failed");
+        }
+
+        private string ExtractRoleFromToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return string.Empty;
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var roleClaim = jwtToken.Claims.FirstOrDefault(
+                    c => c.Type == ClaimTypes.Role ||
+                         c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+
+                return roleClaim?.Value ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error extracting role from token: {ex.Message}");
+                return string.Empty;
+            }
         }
 
         public async Task<bool> Logout()
@@ -80,6 +111,16 @@ namespace eStore.Services.Auth
             var isAuth = _stateContainer.IsAuthenticated;
             Console.WriteLine($"Checking authentication status: {isAuth}");
             return Task.FromResult(isAuth);
+        }
+
+        public string GetUserRole()
+        {
+            return _stateContainer.UserRole;
+        }
+
+        public bool IsInRole(string role)
+        {
+            return string.Equals(_stateContainer.UserRole, role, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

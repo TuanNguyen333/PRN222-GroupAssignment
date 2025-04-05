@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repositories.Impl
+namespace Repositories.Implementation
 {
     public class RepositoryBase<T, TKey> : IRepositoryBase<T, TKey> where T : class
     {

@@ -28,6 +28,7 @@ public partial class eStoreDBContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(getConnectString());
@@ -47,6 +48,7 @@ public partial class eStoreDBContext : DbContext
 
         return connectionString;
     }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

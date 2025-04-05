@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,15 +22,14 @@ namespace Services.Security
             _jwtSettings = jwtSettings.Value;
         }
 
-        public AuthenticationResponse GenerateToken(Member member)
+        public AuthenticationResponse GenerateToken(int memberId, string role)
         {
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, member.MemberId.ToString()),
-            new Claim(ClaimTypes.Email, member.Email),
-            new Claim(ClaimTypes.Role, "Member"),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
+            {
+                new Claim(ClaimTypes.NameIdentifier, memberId.ToString()),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

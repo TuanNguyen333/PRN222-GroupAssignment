@@ -111,7 +111,7 @@
             }
 
             var categoriesResponse = await CategoryService.GetAllCategoriesAsync();
-            categories = categoriesResponse ?? new List<Category>();
+            categories = categoriesResponse?.Data?.Items?.ToList() ?? new List<Category>();
             
             if (categories.Count == 0)
             {
