@@ -1,6 +1,8 @@
 ﻿@page "/orderdetails/details"
 @using eStore.Models
 @using eStore.Services
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
 @inject IOrderDetailService OrderDetailService
 @inject NavigationManager NavigationManager
 
@@ -12,9 +14,9 @@
             <h1>Order Details</h1>
         </div>
         <div class="col text-end">
-            <button class="btn btn-outline-secondary" @onclick="@(() => NavigationManager.NavigateTo("/orderdetails"))">
+            <a href="/orderdetails" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Order Details List
-            </button>
+            </a>
         </div>
     </div>
 
